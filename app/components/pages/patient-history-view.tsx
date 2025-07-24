@@ -560,10 +560,10 @@ function DayDetailCard({ day }: { day: Date }) {
               </div>
               
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                <div className="mb-1">
+                <div className="mb-2">
                   <span className="font-medium">Prescritto:</span> {entry.prescribed_food.name} ({entry.prescribed_food.quantity})
                 </div>
-                <div className="mb-1">
+                <div className="mb-3">
                   <span className="font-medium">Consumato:</span> {entry.actual_food.name} ({entry.actual_food.quantity})
                   {entry.actual_food.was_substituted && (
                     <Badge className="ml-2 bg-orange-100 text-orange-700 text-xs">Sostituito</Badge>
@@ -571,7 +571,7 @@ function DayDetailCard({ day }: { day: Date }) {
                 </div>
                 
                 {entry.rating > 0 && (
-                  <div className="flex items-center gap-1 mt-1">
+                  <div className="flex items-center gap-1 mt-3 mb-3">
                     {[...Array(entry.rating)].map((_, i) => (
                       <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                     ))}
@@ -579,7 +579,7 @@ function DayDetailCard({ day }: { day: Date }) {
                 )}
                 
                 {entry.tags.length > 0 && (
-                  <div className="flex gap-1 mt-1">
+                  <div className="flex flex-wrap gap-2 mt-3 mb-3">
                     {entry.tags.map((tag, index) => (
                       <Badge key={index} className="bg-blue-100 text-blue-700 text-xs">
                         {tag}
@@ -589,7 +589,7 @@ function DayDetailCard({ day }: { day: Date }) {
                 )}
                 
                 {entry.notes && (
-                  <div className="text-xs italic mt-1 text-gray-500">
+                  <div className="text-xs italic mt-3 text-gray-500 bg-gray-100 dark:bg-gray-700 p-2 rounded">
                     "{entry.notes}"
                   </div>
                 )}

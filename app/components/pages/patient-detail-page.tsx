@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "../../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
 import { Badge } from "../../../components/ui/badge"
-import { ChevronLeft, Moon, Sun, Edit, Plus, History, Calendar } from "lucide-react"
+import { ChevronLeft, Moon, Sun, Edit, Plus, History, Calendar, Award, Check, Star } from "lucide-react"
 import { type Patient, type DietPlan, type WeeklyMealPlan } from "../../../lib/supabase"
 import PatientHistoryView from "./patient-history-view"
 
@@ -112,37 +112,69 @@ export default function PatientDetailPage({
           </div>
         </div>
 
+        {/* Patient Info Card */}
         <Card className="w-full bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg mb-6">
           <CardContent className="p-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
                   {patient.name} {patient.surname}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">{patient.email}</p>
-                {getStatusBadge(patient.status)}
+                <div className="flex items-center gap-4 mb-4">
+                  {getStatusBadge(patient.status)}
+                </div>
+                <div className="space-y-3">
+                  <p>
+                    <span className="text-sm text-gray-500">Età:</span>{" "}
+                    <span className="font-semibold">{patient.age} anni</span>
+                  </p>
+                  <p>
+                    <span className="text-sm text-gray-500">Altezza/Peso:</span>{" "}
+                    <span className="font-semibold">
+                      {patient.height}cm / {patient.weight}kg
+                    </span>
+                  </p>
+                  <p>
+                    <span className="text-sm text-gray-500">Ultimo accesso:</span>{" "}
+                    <span className="font-semibold">{patient.last_access}</span>
+                  </p>
+                </div>
               </div>
-              <div className="space-y-3">
-                <p>
-                  <span className="text-sm text-gray-500">Età:</span>{" "}
-                  <span className="font-semibold">{patient.age} anni</span>
-                </p>
-                <p>
-                  <span className="text-sm text-gray-500">Altezza/Peso:</span>{" "}
-                  <span className="font-semibold">
-                    {patient.height}cm / {patient.weight}kg
-                  </span>
-                </p>
-              </div>
-              <div className="space-y-3">
-                <p>
-                  <span className="text-sm text-gray-500">Compliance:</span>{" "}
-                  <span className="text-2xl font-bold text-emerald-600">{patient.compliance}%</span>
-                </p>
-                <p>
-                  <span className="text-sm text-gray-500">Ultimo accesso:</span>{" "}
-                  <span className="font-semibold">{patient.last_access}</span>
-                </p>
+              <div>
+                <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center">
+                  <Award className="h-5 w-5 mr-2 text-emerald-400" />
+                  Compliance del Paziente
+                </h3>
+                <div className="space-y-4">
+                  {/* Main Score */}
+                  <Card className="bg-emerald-400 text-white rounded-2xl border-0 shadow-md">
+                    <CardContent className="p-6 text-center">
+                      <Award className="h-12 w-12 mx-auto mb-3 text-emerald-100" />
+                      <div className="text-4xl font-bold mb-1">{patient.compliance}</div>
+                      <div className="text-emerald-100 text-sm">Punteggio Compliance</div>
+                    </CardContent>
+                  </Card>
+                  
+                  {/* Stats Grid */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 text-center">
+                      <Check className="h-6 w-6 mx-auto mb-2 text-emerald-400" />
+                      <div className="text-lg font-bold text-gray-800 dark:text-white">18</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">Pasti completati</div>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 text-center">
+                      <Star className="h-6 w-6 mx-auto mb-2 text-emerald-400" />
+                      <div className="text-lg font-bold text-gray-800 dark:text-white">4.3</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">Rating medio</div>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 text-center">
+                      <Award className="h-6 w-6 mx-auto mb-2 text-emerald-400" />
+                      <div className="text-lg font-bold text-gray-800 dark:text-white">3</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">Target raggiunti</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
