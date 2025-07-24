@@ -1,10 +1,12 @@
 "use client"
 
+import { useState } from "react"
 import { Button } from "../../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
 import { Badge } from "../../../components/ui/badge"
-import { ChevronLeft, Moon, Sun, Edit, Plus } from "lucide-react"
+import { ChevronLeft, Moon, Sun, Edit, Plus, History, Calendar } from "lucide-react"
 import { type Patient, type DietPlan, type WeeklyMealPlan } from "../../../lib/supabase"
+import PatientHistoryView from "./patient-history-view"
 
 interface PatientDetailPageProps {
   patient: Patient | null
@@ -27,7 +29,18 @@ export default function PatientDetailPage({
   theme,
   setTheme
 }: PatientDetailPageProps) {
+  const [showHistoryView, setShowHistoryView] = useState(false)
   const dayNamesFull = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"]
+
+  // If showing history view, render that component
+  if (showHistoryView && patient) {
+    return (
+      <PatientHistoryView 
+        patient={patient} 
+        onBack={() => setShowHistoryView(false)} 
+      />
+    )
+  }
 
   // Debugging: log the weeklyMealPlan data
   console.log('PatientDetailPage - weeklyMealPlan:', weeklyMealPlan)
@@ -78,14 +91,25 @@ export default function PatientDetailPage({
           <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent">
             Dettaglio Paziente
           </h1>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="rounded-full bg-gray-100 dark:bg-gray-800"
-          >
-            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowHistoryView(true)}
+              className="rounded-full bg-blue-400 text-white hover:bg-blue-500 shadow-md"
+              title="Visualizza storico paziente"
+            >
+              <History className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="rounded-full bg-gray-100 dark:bg-gray-800"
+            >
+              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+          </div>
         </div>
 
         <Card className="w-full bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg mb-6">

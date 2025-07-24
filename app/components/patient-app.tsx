@@ -19,10 +19,13 @@ import {
   Award,
   Moon,
   Sun,
+  Info,
+  Activity,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Input } from "@/components/ui/input"
 import { mockWeeklyPlan, weekDays, ratingTags } from "../data"
@@ -48,11 +51,96 @@ interface Meal {
   completed: boolean
 }
 
+interface WeekDay {
+  day: string
+  date: string
+  isToday: boolean
+  key: string
+}
+
 export default function PatientAppComponent() {
   const [currentView, setCurrentView] = useState<"dashboard" | "compliance" | "weekly">("dashboard")
   const [meals, setMeals] = useState(mockWeeklyPlan["Mercoledì"])
   const [weeklyPlan] = useState(mockWeeklyPlan)
   const [selectedDay, setSelectedDay] = useState(weekDays.find((d) => d.isToday) || weekDays[0])
+  
+  // Enhanced weekly view state
+  const [currentWeekStart, setCurrentWeekStart] = useState(new Date(2025, 6, 7)) // July 7, 2025 (Monday)
+  const [isHistoricalView, setIsHistoricalView] = useState(false)
+
+  // Helper functions for weekly navigation
+  const formatWeekRange = (weekStart: Date) => {
+    const weekEnd = new Date(weekStart)
+    weekEnd.setDate(weekStart.getDate() + 6)
+    return `${weekStart.getDate()} - ${weekEnd.getDate()} Luglio`
+  }
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('it-IT', { 
+      weekday: 'long', 
+      day: 'numeric', 
+      month: 'long' 
+    })
+  }
+
+  const isCurrentWeek = (weekStart: Date) => {
+    const today = new Date()
+    const currentWeekStart = new Date(today)
+    currentWeekStart.setDate(today.getDate() - today.getDay() + 1) // Monday
+    return weekStart.getTime() === currentWeekStart.getTime()
+  }
+
+  const navigateWeek = (direction: 'prev' | 'next') => {
+    const newWeek = new Date(currentWeekStart)
+    newWeek.setDate(currentWeekStart.getDate() + (direction === 'next' ? 7 : -7))
+    setCurrentWeekStart(newWeek)
+    setIsHistoricalView(!isCurrentWeek(newWeek))
+  }
+
+  // Mock functions for calculating week stats
+  const calculateWeekCompliance = () => {
+    // In real app, this would calculate based on actual diary data
+    return isHistoricalView ? Math.floor(Math.random() * 30) + 70 : 92
+  }
+
+  const countSubstitutions = () => {
+    // In real app, this would count actual substitutions
+    return isHistoricalView ? Math.floor(Math.random() * 5) + 1 : 3
+  }
+
+  const averageRating = () => {
+    // In real app, this would calculate average of all ratings
+    return isHistoricalView ? (Math.random() * 2 + 3).toFixed(1) : "4.3"
+  }
+
+  const hasDietPlanChange = (weekStart: Date) => {
+    // Mock: assume diet plan changed on July 17, 2025
+    const changeDate = new Date(2025, 6, 17)
+    const weekEnd = new Date(weekStart)
+    weekEnd.setDate(weekStart.getDate() + 6)
+    return changeDate >= weekStart && changeDate <= weekEnd
+  }
+
+  const getDietPlanChangeDate = () => {
+    return new Date(2025, 6, 17)
+  }
+
+  // Calculate compliance for a specific day
+  const calculateDayCompliance = (dayMeals: Meal[]) => {
+    if (!dayMeals || dayMeals.length === 0) return 0
+    
+    let totalItems = 0
+    let completedItems = 0
+    
+    dayMeals.forEach(meal => {
+      meal.items.forEach(item => {
+        totalItems++
+        if (item.completed) completedItems++
+      })
+    })
+    
+    return totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0
+  }
 
   const [selectedItem, setSelectedItem] = useState<MealItem | null>(null)
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null)
@@ -69,9 +157,9 @@ export default function PatientAppComponent() {
 
   const { theme, setTheme } = useTheme()
 
-  const handleDayClick = (day) => {
+  const handleDayClick = (day: WeekDay) => {
     setSelectedDay(day)
-    setMeals(weeklyPlan[day.key] || [])
+    setMeals(weeklyPlan[day.key as keyof typeof weeklyPlan] || [])
   }
 
   const handleTouchStart = (e: React.TouchEvent, itemId: string) => {
@@ -182,7 +270,7 @@ export default function PatientAppComponent() {
     return (
       <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900">
         <div className="w-full">
-          {/* Header */}
+          {/* Enhanced Header */}
           <div className="w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg sticky top-0 z-10 p-4 md:p-6 rounded-b-3xl shadow-lg">
             <div className="flex items-center justify-between mb-6">
               <Button
@@ -211,80 +299,215 @@ export default function PatientAppComponent() {
             </div>
 
             {/* Week Navigation */}
-            <div className="flex items-center justify-between mb-6">
-              <Button variant="ghost" size="icon" className="rounded-full bg-gray-100 dark:bg-gray-800">
+            <div className="flex items-center justify-between mb-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigateWeek('prev')}
+                className="rounded-full bg-gray-100 dark:bg-gray-800"
+              >
                 <ChevronLeft className="h-4 w-4 text-gray-600 dark:text-gray-300" />
               </Button>
-              <span className="font-semibold text-gray-700 dark:text-gray-200">5 - 11 Luglio</span>
-              <Button variant="ghost" size="icon" className="rounded-full bg-gray-100 dark:bg-gray-800">
+              
+              <div className="text-center">
+                <h2 className="text-lg font-bold text-gray-700 dark:text-gray-200">
+                  {formatWeekRange(currentWeekStart)}
+                </h2>
+                {isHistoricalView && (
+                  <Badge className="bg-blue-100 text-blue-700 mt-1">
+                    Storico
+                  </Badge>
+                )}
+              </div>
+              
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigateWeek('next')}
+                disabled={isCurrentWeek(currentWeekStart)}
+                className="rounded-full bg-gray-100 dark:bg-gray-800"
+              >
                 <ChevronRight className="h-4 w-4 text-gray-600 dark:text-gray-300" />
               </Button>
             </div>
 
-            {/* Days */}
-            <div className="grid grid-cols-7 gap-2 w-full">
-              {weekDays.map((day, index) => (
-                <div key={index} className="text-center cursor-pointer" onClick={() => handleDayClick(day)}>
-                  <div
-                    className={`w-full aspect-square max-w-12 mx-auto rounded-2xl flex items-center justify-center mb-2 transition-all duration-300 hover:scale-105 ${
-                      selectedDay.date === day.date
-                        ? "bg-emerald-400 text-white shadow-lg"
-                        : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300"
-                    }`}
-                  >
-                    <span className="font-bold text-sm">{day.date}</span>
-                  </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">{day.day}</span>
+            {/* Week Stats */}
+            <div className="grid grid-cols-3 gap-2 text-center mb-4">
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-2">
+                <div className="text-2xl font-bold text-emerald-600">
+                  {calculateWeekCompliance()}%
                 </div>
-              ))}
+                <div className="text-xs text-gray-600">Compliance</div>
+              </div>
+              <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-2">
+                <div className="text-2xl font-bold text-orange-600">
+                  {countSubstitutions()}
+                </div>
+                <div className="text-xs text-gray-600">Sostituzioni</div>
+              </div>
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2">
+                <div className="text-2xl font-bold text-blue-600">
+                  {averageRating()}
+                </div>
+                <div className="text-xs text-gray-600">Rating Medio</div>
+              </div>
             </div>
+            
+            {/* Diet Plan Change Indicator */}
+            {hasDietPlanChange(currentWeekStart) && (
+              <Alert className="mt-3 bg-blue-50 border-blue-200">
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  Il piano alimentare è cambiato il {formatDate(getDietPlanChangeDate())}
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
 
-          {/* Weekly Overview */}
+          {/* Weekly Days with Full Diet and Reviews */}
           <div className="w-full p-4 md:p-6 space-y-6">
-            <Card className="w-full bg-emerald-400 text-white rounded-3xl border-0 shadow-xl animate-fade-in-up">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-bold">Piano del Giorno</h3>
-                    <p className="text-emerald-100">
-                      {selectedDay.day}, {selectedDay.date} Luglio
-                    </p>
-                  </div>
-                  <Target className="h-8 w-8 text-emerald-100" />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Daily Summary Cards */}
-            {meals.length > 0 ? (
-              meals.map((meal, index) => (
-                <Card
-                  key={meal.id}
-                  className="w-full bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg animate-fade-in-up"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <div className={`h-2 w-full ${meal.completed ? "bg-emerald-400" : "bg-emerald-300"}`}></div>
-                  <CardContent className="p-6">
-                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">{meal.name}</h3>
-                    <div className="space-y-3">
-                      {meal.items.map((item) => (
-                        <div key={item.id} className="flex justify-between items-center text-sm">
-                          <span className="text-gray-700 dark:text-gray-300">{item.name}</span>
-                          <span className="font-medium text-gray-500 dark:text-gray-400">{item.quantity}</span>
+            {/* Generate all 7 days of the week */}
+            {Array.from({ length: 7 }, (_, index) => {
+              const dayDate = new Date(currentWeekStart)
+              dayDate.setDate(currentWeekStart.getDate() + index)
+              const dayName = dayDate.toLocaleDateString('it-IT', { weekday: 'long' })
+              const formattedDate = dayDate.toLocaleDateString('it-IT', { day: 'numeric', month: 'long' })
+              
+              // Get meals for this day (in real app, this would fetch from database)
+              const dayKey = dayName.charAt(0).toUpperCase() + dayName.slice(1)
+              const dayMeals = weeklyPlan[dayKey as keyof typeof weeklyPlan] || []
+              
+              return (
+                <div key={index} className="space-y-4">
+                  {/* Day Header */}
+                  <Card className="w-full bg-emerald-400 text-white rounded-3xl border-0 shadow-xl">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-lg font-bold capitalize">{dayName}</h3>
+                          <p className="text-emerald-100 text-sm">{formattedDate}</p>
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <Card className="w-full bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg animate-fade-in-up">
-                <CardContent className="p-10 text-center">
-                  <p className="text-gray-500 dark:text-gray-400">Nessun piano per questo giorno.</p>
-                </CardContent>
-              </Card>
-            )}
+                        <div className="text-right">
+                          <div className="text-2xl font-bold">
+                            {isHistoricalView ? calculateDayCompliance(dayMeals) : "-"}%
+                          </div>
+                          {isHistoricalView && (
+                            <p className="text-emerald-100 text-xs">Compliance</p>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Meals for this day */}
+                  {dayMeals.length > 0 ? (
+                    dayMeals.map((meal) => (
+                      <Card
+                        key={meal.id}
+                        className="w-full bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg overflow-hidden"
+                      >
+                        <div className={`h-2 w-full ${meal.completed ? "bg-emerald-400" : "bg-gray-300"}`}></div>
+                        
+                        <CardContent className="p-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <h4 className="text-lg font-bold text-gray-800 dark:text-white">{meal.name}</h4>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">{meal.time}</span>
+                          </div>
+
+                          <div className="space-y-4">
+                            {meal.items.map((item) => (
+                              <div 
+                                key={item.id} 
+                                className={`relative w-full bg-gray-50 dark:bg-gray-700/50 rounded-2xl p-4 transition-all duration-300 ${
+                                  (item as any).completed
+                                    ? "bg-emerald-50 dark:bg-emerald-900/50 border-2 border-emerald-200 dark:border-emerald-700"
+                                    : ""
+                                }`}
+                              >
+                                <div className="flex items-start justify-between w-full">
+                                  <div className="flex-1 min-w-0 pr-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <span className="font-semibold text-gray-800 dark:text-gray-100">
+                                        {item.name}
+                                      </span>
+                                      {(item as any).completed && (item as any).rating && (
+                                        <div className="flex items-center gap-1">
+                                          {[...Array(5)].map((_, i) => (
+                                            <Star 
+                                              key={i} 
+                                              className={`h-3 w-3 ${
+                                                i < (item as any).rating! 
+                                                  ? "fill-yellow-400 text-yellow-400" 
+                                                  : "text-gray-300 dark:text-gray-600"
+                                              }`} 
+                                            />
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">
+                                      {item.quantity}
+                                    </div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                      {item.calories} kcal
+                                    </div>
+                                    
+                                    {/* Tags if reviewed */}
+                                    {(item as any).completed && (item as any).tags && (item as any).tags.length > 0 && (
+                                      <div className="flex flex-wrap gap-1 mt-2">
+                                        {(item as any).tags.map((tag: string) => (
+                                          <Badge 
+                                            key={tag} 
+                                            className="bg-emerald-100 text-emerald-700 dark:bg-emerald-800 dark:text-emerald-200 text-xs rounded-full px-2 py-0.5"
+                                          >
+                                            {tag}
+                                          </Badge>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Status indicators */}
+                                  <div className="flex flex-col items-end gap-2">
+                                    {(item as any).completed ? (
+                                      <div className="flex items-center gap-2">
+                                        <Check className="h-5 w-5 text-emerald-500" />
+                                        <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                                          Completato
+                                        </span>
+                                      </div>
+                                    ) : isHistoricalView ? (
+                                      <div className="flex items-center gap-2">
+                                        <X className="h-5 w-5 text-red-500" />
+                                        <span className="text-xs text-red-600 dark:text-red-400 font-medium">
+                                          Non consumato
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <Badge className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs">
+                                        Da consumare
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  ) : (
+                    <Card className="w-full bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg">
+                      <CardContent className="p-10 text-center">
+                        <p className="text-gray-500 dark:text-gray-400">
+                          Nessun piano per questo giorno
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>
