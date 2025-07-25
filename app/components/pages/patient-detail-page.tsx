@@ -77,18 +77,18 @@ export default function PatientDetailPage({
   }
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900 animate-fade-in-up">
       <div className="w-full max-w-7xl mx-auto p-4 lg:p-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 animate-fade-in-down">
           <Button
             variant="ghost"
             size="icon"
             onClick={onBack}
-            className="rounded-full bg-emerald-400 text-white hover:bg-emerald-500 shadow-md"
+            className="rounded-full bg-emerald-400 text-white hover:bg-emerald-500 shadow-md transition-all duration-300 hover:scale-110 hover:-translate-x-1"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent animate-scale-in">
             Dettaglio Paziente
           </h1>
           <div className="flex items-center gap-2">
@@ -96,8 +96,9 @@ export default function PatientDetailPage({
               variant="ghost"
               size="icon"
               onClick={() => setShowHistoryView(true)}
-              className="rounded-full bg-blue-400 text-white hover:bg-blue-500 shadow-md"
+              className="rounded-full bg-blue-400 text-white hover:bg-blue-500 shadow-md transition-all duration-300 hover:scale-110 animate-fade-in-right"
               title="Visualizza storico paziente"
+              style={{animationDelay: '0.1s'}}
             >
               <History className="h-5 w-5" />
             </Button>
@@ -105,7 +106,8 @@ export default function PatientDetailPage({
               variant="ghost"
               size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="rounded-full bg-gray-100 dark:bg-gray-800"
+              className="rounded-full bg-gray-100 dark:bg-gray-800 transition-all duration-300 hover:scale-110 hover:rotate-180 animate-fade-in-right"
+              style={{animationDelay: '0.2s'}}
             >
               {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
@@ -113,7 +115,7 @@ export default function PatientDetailPage({
         </div>
 
         {/* Patient Info Card */}
-        <Card className="w-full bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg mb-6">
+        <Card className="w-full bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg mb-6 animate-fade-in-up">
           <CardContent className="p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -181,13 +183,13 @@ export default function PatientDetailPage({
         </Card>
 
         {/* Weekly Plan View */}
-        <Card className="w-full bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg">
-          <CardHeader>
+        <Card className="w-full bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg animate-fade-in-up">
+          <CardHeader className="animate-fade-in-down">
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-bold text-gray-800 dark:text-white">
                 Piano Settimanale Completo
               </CardTitle>
-              <Button onClick={onEditPlan} variant="outline" className="rounded-full">
+              <Button onClick={onEditPlan} variant="outline" className="rounded-full transition-all duration-300 hover:scale-105 hover:bg-emerald-50 hover:border-emerald-400 hover:text-emerald-600">
                 <Edit className="h-4 w-4 mr-2" /> Modifica Piano
               </Button>
             </div>
@@ -206,9 +208,9 @@ export default function PatientDetailPage({
                     return (
                       <Card 
                         key={dayName} 
-                        className={`transition-all duration-300 hover:shadow-md ${
+                        className={`${
                           isToday 
-                            ? 'ring-2 ring-emerald-400 bg-emerald-50 dark:bg-emerald-900/20' 
+                            ? 'ring-2 ring-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 animate-pulse-glow' 
                             : 'bg-gray-50 dark:bg-gray-700/50'
                         }`}
                       >
@@ -284,9 +286,9 @@ export default function PatientDetailPage({
                     return (
                       <Card 
                         key={dayName} 
-                        className={`transition-all duration-300 hover:shadow-md ${
+                        className={`${
                           isToday 
-                            ? 'ring-2 ring-emerald-400 bg-emerald-50 dark:bg-emerald-900/20' 
+                            ? 'ring-2 ring-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 animate-pulse-glow' 
                             : 'bg-gray-50 dark:bg-gray-700/50'
                         }`}
                       >
@@ -362,9 +364,9 @@ export default function PatientDetailPage({
                     return (
                       <Card 
                         key={dayName} 
-                        className={`transition-all duration-300 hover:shadow-md ${
+                        className={`${
                           isToday 
-                            ? 'ring-2 ring-emerald-400 bg-emerald-50 dark:bg-emerald-900/20' 
+                            ? 'ring-2 ring-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 animate-pulse-glow' 
                             : 'bg-gray-50 dark:bg-gray-700/50'
                         }`}
                       >
@@ -442,9 +444,9 @@ export default function PatientDetailPage({
                       return (
                         <Card 
                           key={dayName} 
-                          className={`transition-all duration-300 hover:shadow-md ${
+                          className={`${
                             isToday 
-                              ? 'ring-2 ring-emerald-400 bg-emerald-50 dark:bg-emerald-900/20' 
+                              ? 'ring-2 ring-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 animate-pulse-glow' 
                               : 'bg-gray-50 dark:bg-gray-700/50'
                           }`}
                         >

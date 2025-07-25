@@ -645,15 +645,15 @@ export default function PatientAppComponent() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900 animate-fade-in-up">
       <div className="w-full">
         {/* Header */}
-        <div className="w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg sticky top-0 z-10 p-4 md:p-6 rounded-b-3xl shadow-lg">
+        <div className="w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg sticky top-0 z-10 p-4 md:p-6 rounded-b-3xl shadow-lg animate-fade-in-down">
           <div className="flex items-center justify-between mb-6">
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full bg-emerald-400 text-white shadow-md transition-all hover:shadow-glow"
+              className="rounded-full bg-emerald-400 text-white shadow-md transition-all hover:shadow-glow hover:scale-110 animate-scale-in"
             >
               <User className="h-5 w-5" />
             </Button>
@@ -662,7 +662,8 @@ export default function PatientAppComponent() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 shadow-md transition-all"
+                className="rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 shadow-md transition-all hover:scale-110 hover:rotate-180 animate-fade-in-right"
+                style={{animationDelay: '0.1s'}}
               >
                 {theme === "dark" ? (
                   <Sun className="h-5 w-5 text-gray-600 dark:text-gray-300" />
@@ -674,7 +675,8 @@ export default function PatientAppComponent() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setCurrentView("compliance")}
-                className="rounded-full bg-emerald-400 text-white hover:bg-emerald-500 shadow-md transition-all hover:shadow-glow"
+                className="rounded-full bg-emerald-400 text-white hover:bg-emerald-500 shadow-md transition-all hover:shadow-glow hover:scale-110 animate-fade-in-right"
+                style={{animationDelay: '0.2s'}}
               >
                 <TrendingUp className="h-5 w-5" />
               </Button>
@@ -682,7 +684,8 @@ export default function PatientAppComponent() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setCurrentView("weekly")}
-                className="rounded-full bg-emerald-400 text-white hover:bg-emerald-500 shadow-md transition-all hover:shadow-glow"
+                className="rounded-full bg-emerald-400 text-white hover:bg-emerald-500 shadow-md transition-all hover:shadow-glow hover:scale-110 animate-fade-in-right"
+                style={{animationDelay: '0.3s'}}
               >
                 <Calendar className="h-5 w-5" />
               </Button>
@@ -690,7 +693,7 @@ export default function PatientAppComponent() {
           </div>
 
           {/* Date */}
-          <div className="text-center animate-fade-in-up">
+          <div className="text-center animate-fade-in-up" style={{animationDelay: '0.4s'}}>
             <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent">
               Mercoledì, 7 Luglio
             </h1>
@@ -719,7 +722,7 @@ export default function PatientAppComponent() {
                     <div key={item.id} className="relative w-full">
                       <div
                         className={`w-full bg-gray-50 dark:bg-gray-700/50 rounded-2xl p-4 transition-all duration-300 ${
-                          item.completed
+                          'completed' in item && item.completed
                             ? "bg-emerald-50 dark:bg-emerald-900/50 border-2 border-emerald-200 dark:border-emerald-700"
                             : ""
                         } ${swipedItem === item.id ? "transform -translate-x-20" : ""}`}
@@ -733,9 +736,9 @@ export default function PatientAppComponent() {
                               <span className="font-semibold text-gray-800 dark:text-gray-100 truncate">
                                 {item.name}
                               </span>
-                              {item.completed && (
+                              {'completed' in item && item.completed && (
                                 <div className="flex items-center gap-1 flex-shrink-0">
-                                  {[...Array(item.rating || 0)].map((_, i) => (
+                                  {[...Array(('rating' in item ? item.rating : 0) || 0)].map((_, i) => (
                                     <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                                   ))}
                                 </div>

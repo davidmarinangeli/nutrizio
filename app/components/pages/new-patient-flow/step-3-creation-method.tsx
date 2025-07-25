@@ -93,14 +93,22 @@ export default function Step3CreationMethod({
           <Card 
             className={`cursor-pointer transition-all duration-300 ${
               selectedCreationMethod === "ai" 
-                ? "ring-2 ring-emerald-400 bg-emerald-50 dark:bg-emerald-900/20" 
-                : "hover:shadow-lg"
+                ? "ring-2 ring-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 shadow-ai-gradient" 
+                : "hover:shadow-lg hover:shadow-ai-blue hover:scale-105 hover:bg-gradient-to-br hover:from-blue-50 hover:to-emerald-50 dark:hover:from-blue-900/20 dark:hover:to-emerald-900/20"
             }`}
             onClick={() => setSelectedCreationMethod("ai")}
           >
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 p-4 bg-emerald-100 dark:bg-emerald-900/40 rounded-full w-16 h-16 flex items-center justify-center">
-                <Brain className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+              <div className={`mx-auto mb-4 p-4 rounded-full w-16 h-16 flex items-center justify-center transition-all duration-1200 ${
+                selectedCreationMethod === "ai" 
+                  ? "bg-gradient-to-br from-blue-100 to-emerald-100 dark:from-blue-900/40 dark:to-emerald-900/40 animate-ai-glow" 
+                  : "bg-emerald-100 dark:bg-emerald-900/40 hover:animate-ai-pulse"
+              }`}>
+                <Brain className={`h-8 w-8 transition-all duration-1200 ${
+                  selectedCreationMethod === "ai" 
+                    ? "text-blue-600 dark:text-blue-400" 
+                    : "text-emerald-600 dark:text-emerald-400"
+                }`} />
               </div>
               <CardTitle className="text-lg font-bold text-gray-800 dark:text-white">
                 Generazione AI
@@ -310,11 +318,15 @@ export default function Step3CreationMethod({
           <Button
             onClick={onNext}
             disabled={!canProceed || isLoading}
-            className="rounded-2xl px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold"
+            className={`rounded-2xl px-8 py-3 font-semibold transition-all duration-1200 ${
+              isLoading 
+                ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white animate-ai-loading shadow-ai-gradient' 
+                : 'bg-emerald-500 hover:bg-emerald-600 text-white hover:shadow-glow hover:scale-105'
+            }`}
           >
             {isLoading ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="h-4 w-4 mr-2 animate-ai-spin" />
                 Generando...
               </>
             ) : (

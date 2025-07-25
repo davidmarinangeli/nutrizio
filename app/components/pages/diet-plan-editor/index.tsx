@@ -468,7 +468,7 @@ export default function DietPlanEditor({
             >
               <CardHeader className="text-center pb-3 border-b border-gray-200 dark:border-gray-700">
                 <CardTitle className="text-lg font-bold text-gray-700 dark:text-gray-300">
-                  {dayShort[prevDayIndex]} {dates[prevDayIndex]}
+                  {dayNamesFull[prevDayIndex]}
                 </CardTitle>
               </CardHeader>
               <CardContent
@@ -527,7 +527,7 @@ export default function DietPlanEditor({
             >
               <CardHeader className="text-center pb-4 border-b border-emerald-300">
                 <CardTitle className="text-3xl font-bold">
-                  {dayShort[selectedDayIndex]} {dates[selectedDayIndex]}
+                  {dayNamesFull[selectedDayIndex]}
                 </CardTitle>
                 <p className="text-emerald-100 text-lg mt-1">Oggi</p>
               </CardHeader>
@@ -725,7 +725,7 @@ export default function DietPlanEditor({
             >
               <CardHeader className="text-center pb-3 border-b border-gray-200 dark:border-gray-700">
                 <CardTitle className="text-lg font-bold text-gray-700 dark:text-gray-300">
-                  {dayShort[nextDayIndex]} {dates[nextDayIndex]}
+                  {dayNamesFull[nextDayIndex]}
                 </CardTitle>
               </CardHeader>
               <CardContent
@@ -871,16 +871,20 @@ export default function DietPlanEditor({
                       disabled={isGeneratingAI}
                       size="sm"
                       variant="outline"
-                      className="text-purple-600 border-purple-200 hover:bg-purple-50 hover:border-purple-300"
+                      className={`transition-all duration-300 ${
+                        isGeneratingAI 
+                          ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white border-transparent animate-ai-loading shadow-ai-gradient' 
+                          : 'text-blue-600 border-blue-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-emerald-50 hover:border-blue-300 hover:shadow-ai-blue hover:scale-105 hover:text-blue-700'
+                      }`}
                     >
                       {isGeneratingAI ? (
                         <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          <Loader2 className="h-4 w-4 mr-2 animate-ai-spin" />
                           Generando...
                         </>
                       ) : (
                         <>
-                          <Wand2 className="h-4 w-4 mr-2" />
+                          <Wand2 className="h-4 w-4 mr-2 transition-all duration-1200 hover:rotate-12 hover:text-blue-600" />
                           Suggerisci con AI
                         </>
                       )}

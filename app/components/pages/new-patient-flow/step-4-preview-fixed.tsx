@@ -542,288 +542,313 @@ export default function Step4PreviewFixed({
                 </div>
 
                 {/* Three-Card Layout */}
-                <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-300 ${
+                <div className={`grid grid-cols-12 gap-4 min-h-[700px] transition-all duration-300 ${
                   isTransitioning ? 'opacity-75 scale-95' : 'opacity-100 scale-100'
                 }`}>
                   
                   {/* Previous Day Card */}
-                  <div className="lg:block hidden">
-                    <Card className="bg-emerald-50 border border-emerald-200 h-full">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-lg text-emerald-700 text-center">
+                  <div className="col-span-12 md:col-span-3">
+                    <Card
+                      className="h-full bg-white/80 dark:bg-gray-800/80 rounded-3xl border-0 shadow-md cursor-pointer hover:shadow-lg transition-all"
+                      onClick={() => handleDayChange(selectedDayIndex - 1)}
+                    >
+                      <CardHeader className="text-center pb-3 border-b border-gray-200 dark:border-gray-700">
+                        <CardTitle className="text-lg font-bold text-gray-700 dark:text-gray-300">
                           {dayNamesFull[prevDayIndex]}
                         </CardTitle>
-                        <p className="text-sm text-emerald-600 text-center">
-                          {prevDayMeals.length} pasti
-                        </p>
                       </CardHeader>
-                      <CardContent className="p-4">
-                        <div 
-                          id="prev-day-container"
-                          className="space-y-3 max-h-96 overflow-y-auto"
-                        >
-                          {prevDayMeals.length > 0 ? (
-                            prevDayMeals.map((meal: any, index: number) => (
-                              <Card 
-                                key={meal.id || index} 
-                                className={`bg-white border border-emerald-300 transition-all duration-200 ${
-                                  index === currentMealIndex ? 'ring-2 ring-emerald-500 shadow-lg bg-emerald-50' : ''
-                                }`}
-                                data-meal-index={index}
-                              >
-                                <CardContent className="p-3">
-                                  <h6 className="font-medium text-emerald-800 text-sm mb-2">
-                                    {meal.meal_name || meal.name || meal.type}
-                                  </h6>
-                                  <div className="space-y-1">
-                                    {(meal.food_items || meal.foods || []).map((food: any, foodIdx: number) => (
-                                      <div key={food.id || foodIdx} className="text-xs text-emerald-700 bg-emerald-100 p-1 rounded">
-                                        {food.name} - {food.quantity}{food.unit}
-                                      </div>
-                                    ))}
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            ))
-                          ) : (
-                            <div className="text-center py-8 text-emerald-400 text-sm">
-                              Nessun pasto configurato
+                      <CardContent
+                        id="prev-day-container"
+                        className="p-4 space-y-3 max-h-[600px] overflow-y-auto scroll-smooth"
+                        style={{ scrollBehavior: "smooth" }}
+                      >
+                        {prevDayMeals.length > 0 ? (
+                          prevDayMeals.map((meal: any, index: number) => (
+                            <div
+                              key={meal.id || index}
+                              data-meal-index={index}
+                              className={`transition-all duration-300 rounded-xl p-3 ${
+                                index === currentMealIndex
+                                  ? "bg-emerald-100 dark:bg-emerald-900/30 ring-2 ring-emerald-400 shadow-lg transform scale-105"
+                                  : "bg-gray-50 dark:bg-gray-700/50"
+                              }`}
+                            >
+                              <h4 className="text-sm font-semibold text-gray-800 dark:text-white truncate">
+                                {meal.meal_name || meal.name || meal.type}
+                              </h4>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {(meal.food_items || meal.foods || []).length} alimenti - {meal.total_calories || meal.totalCalories || 0} kcal
+                              </p>
+                              {index === currentMealIndex && (
+                                <div className="mt-2 space-y-1 animate-fade-in-up">
+                                  {(meal.food_items || meal.foods || []).slice(0, 3).map((food: any, foodIdx: number) => (
+                                    <p key={food.id || foodIdx} className="text-xs text-gray-600 dark:text-gray-300 truncate">
+                                      • {food.name}
+                                    </p>
+                                  ))}
+                                  {(meal.food_items || meal.foods || []).length > 3 && (
+                                    <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                                      +{(meal.food_items || meal.foods || []).length - 3} altri
+                                    </p>
+                                  )}
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
+                          ))
+                        ) : (
+                          <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">Nessun pasto</p>
+                        )}
                       </CardContent>
                     </Card>
                   </div>
 
                   {/* Current Day Card - Main Editor */}
-                  <div className="lg:col-span-1 col-span-1">
-                    <Card className="bg-white border-2 border-emerald-400 h-full shadow-lg">
-                      <CardHeader className="pb-3 bg-emerald-50">
-                        <CardTitle className="text-lg text-emerald-700 text-center font-bold">
+                  <div className="col-span-12 md:col-span-6">
+                    <Card
+                      className={`h-full bg-emerald-400 text-white rounded-3xl border-0 shadow-xl transition-all duration-300 ${
+                        isTransitioning
+                          ? `transform ${transitionDirection === "right" ? "translate-x-4" : "-translate-x-4"} opacity-75`
+                          : "translate-x-0 opacity-100"
+                      }`}
+                    >
+                      <CardHeader className="text-center pb-4 border-b border-emerald-300">
+                        <CardTitle className="text-3xl font-bold">
                           {dayNamesFull[selectedDayIndex]}
                         </CardTitle>
-                        <p className="text-sm text-emerald-600 text-center">
+                        <p className="text-emerald-100 text-lg mt-1">
                           {currentDayMeals.length} pasti • Modifica attiva
                         </p>
                       </CardHeader>
-                      <CardContent className="p-4">
-                        <div className="space-y-4 max-h-96 overflow-y-auto">
-                          {currentDayMeals.length > 0 ? (
-                            currentDayMeals.map((meal: any, index: number) => (
-                              <Card 
-                                key={meal.id || index} 
-                                className="bg-emerald-50 border border-emerald-200 hover:shadow-md transition-shadow"
-                                data-meal-index={index}
-                                onMouseEnter={() => setCurrentMealIndex(index)}
-                                onMouseLeave={() => setCurrentMealIndex(-1)}
-                              >
-                                <CardContent className="p-4">
-                                  <div className="flex items-center justify-between mb-3">
-                                    <h5 className="font-semibold text-gray-800">
-                                      {meal.meal_name || meal.name || meal.type}
-                                    </h5>
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-sm text-emerald-600 font-medium">
-                                        {meal.total_calories || meal.totalCalories || 0} kcal
-                                      </span>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700"
-                                        onClick={() => setShowAddFood(showAddFood === meal.id ? null : meal.id)}
-                                      >
-                                        <Plus className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                  
-                                  <div className="space-y-2 mb-3">
-                                    {(meal.food_items || meal.foods || []).map((food: any, foodIndex: number) => (
-                                      <div key={food.id || foodIndex} className="bg-white p-3 rounded border group">
-                                        <div className="flex items-center justify-between">
-                                          <div className="flex-1">
-                                            <span className="text-sm font-medium">
-                                              {food.name} - {food.quantity}{food.unit}
-                                            </span>
-                                            <div className="text-xs text-gray-500">
-                                              {food.calories || 0} kcal
-                                              {food.alternatives && food.alternatives.length > 0 && (
-                                                <span className="ml-2 text-emerald-600">
-                                                  • {food.alternatives.length} alternative
-                                                </span>
-                                              )}
-                                            </div>
-                                          </div>
-                                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <Button
-                                              variant="ghost"
-                                              size="sm"
-                                              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700"
-                                              onClick={() => setSelectedFoodForAlternatives({ mealId: meal.id, foodId: food.id, food })}
-                                            >
-                                              <Edit className="h-3 w-3" />
-                                            </Button>
-                                            <Button
-                                              variant="ghost"
-                                              size="sm"
-                                              className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                                              onClick={() => deleteFood(meal.id, food.id)}
-                                            >
-                                              <Trash2 className="h-3 w-3" />
-                                            </Button>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-
-                                  {/* Add Food Form */}
-                                  {showAddFood === meal.id && (
-                                    <Card className="bg-white border border-emerald-200 mt-3">
-                                      <CardContent className="p-3">
-                                        <div className="space-y-3">
-                                          <Input
-                                            placeholder="Nome alimento"
-                                            value={newFoodName}
-                                            onChange={(e) => setNewFoodName(e.target.value)}
-                                          />
-                                          <div className="flex gap-2">
-                                            <Input
-                                              placeholder="Quantità"
-                                              value={newFoodQuantity}
-                                              onChange={(e) => setNewFoodQuantity(e.target.value)}
-                                              className="flex-1"
-                                            />
-                                            <Select value={newFoodUnit} onValueChange={setNewFoodUnit}>
-                                              <SelectTrigger className="w-20">
-                                                <SelectValue />
-                                              </SelectTrigger>
-                                              <SelectContent>
-                                                <SelectItem value="g">g</SelectItem>
-                                                <SelectItem value="ml">ml</SelectItem>
-                                                <SelectItem value="pz">pz</SelectItem>
-                                                <SelectItem value="cucchiai">cucchiai</SelectItem>
-                                              </SelectContent>
-                                            </Select>
-                                          </div>
-                                          <div className="flex gap-2">
-                                            <Button
-                                              onClick={() => addFood(meal.id)}
-                                              size="sm"
-                                              className="flex-1 bg-emerald-500 hover:bg-emerald-600"
-                                              disabled={!newFoodName.trim() || !newFoodQuantity.trim()}
-                                            >
-                                              Aggiungi
-                                            </Button>
-                                            <Button
-                                              variant="outline"
-                                              size="sm"
-                                              onClick={() => setShowAddFood(null)}
-                                            >
-                                              <X className="h-4 w-4" />
-                                            </Button>
-                                          </div>
-                                        </div>
-                                      </CardContent>
-                                    </Card>
-                                  )}
-                                </CardContent>
-                              </Card>
-                            ))
-                          ) : (
-                            <div className="text-center py-8 text-gray-500">
-                              Nessun pasto per questo giorno
-                            </div>
-                          )}
-                          
-                          {/* Add Meal Section */}
-                          {showAddMeal ? (
-                            <Card className="bg-white border border-emerald-200">
+                      <CardContent className="p-6 space-y-4 max-h-[600px] overflow-y-auto scroll-smooth">
+                        {currentDayMeals.length > 0 ? (
+                          currentDayMeals.map((meal: any, index: number) => (
+                            <Card 
+                              key={meal.id || index} 
+                              data-meal-index={index}
+                              className={`bg-white/95 dark:bg-gray-800/95 rounded-2xl border-0 shadow-lg transition-all duration-300 ${
+                                index === currentMealIndex ? "ring-2 ring-white shadow-2xl" : ""
+                              }`}
+                              onMouseEnter={() => setCurrentMealIndex(index)}
+                              onMouseLeave={() => setCurrentMealIndex(-1)}
+                            >
                               <CardContent className="p-4">
-                                <div className="space-y-3">
-                                  <Input
-                                    placeholder="Nome del pasto"
-                                    value={customMealName}
-                                    onChange={(e) => setCustomMealName(e.target.value)}
-                                    className="w-full"
-                                  />
-                                  <div className="flex gap-2">
+                                <div className="flex items-center justify-between mb-3">
+                                  <h3 className="text-lg font-bold text-gray-800 dark:text-white">
+                                    {meal.meal_name || meal.name || meal.type}
+                                  </h3>
+                                  <div className="flex items-center gap-2">
+                                    <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300">
+                                      {meal.total_calories || meal.totalCalories || 0} kcal
+                                    </Badge>
+                                    {index === currentMealIndex && (
+                                      <Badge className="bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300 animate-pulse">
+                                        In Focus
+                                      </Badge>
+                                    )}
                                     <Button
-                                      onClick={addCustomMeal}
-                                      className="flex-1 bg-emerald-500 hover:bg-emerald-600"
-                                      disabled={!customMealName.trim()}
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700"
+                                      onClick={() => setShowAddFood(showAddFood === meal.id ? null : meal.id)}
                                     >
-                                      Crea Pasto
-                                    </Button>
-                                    <Button 
-                                      variant="outline" 
-                                      onClick={() => setShowAddMeal(false)}
-                                    >
-                                      Annulla
+                                      <Plus className="h-4 w-4" />
                                     </Button>
                                   </div>
                                 </div>
+                                
+                                <div className="space-y-3 mb-3">
+                                  {(meal.food_items || meal.foods || []).map((food: any, foodIndex: number) => (
+                                    <div
+                                      key={food.id || foodIndex}
+                                      className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 border border-gray-200 dark:border-gray-600"
+                                    >
+                                      <div className="flex items-center justify-between">
+                                        <span className="font-medium text-gray-800 dark:text-white text-sm">
+                                          {food.name} - {food.quantity}{food.unit}
+                                        </span>
+                                        <div className="flex items-center gap-2">
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-6 w-6 p-0 text-blue-500 hover:bg-blue-100"
+                                            onClick={() => setSelectedFoodForAlternatives({ mealId: meal.id, foodId: food.id, food })}
+                                          >
+                                            <Edit className="h-3 w-3" />
+                                          </Button>
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-6 w-6 p-0 text-red-500 hover:bg-red-100"
+                                            onClick={() => deleteFood(meal.id, food.id)}
+                                          >
+                                            <Trash2 className="h-4 w-4" />
+                                          </Button>
+                                        </div>
+                                      </div>
+                                      {food.alternatives && food.alternatives.length > 0 && (
+                                        <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+                                          <p className="text-xs text-blue-600 dark:text-blue-400">
+                                            {food.alternatives.length} alternative disponibili
+                                          </p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+
+                                {/* Add Food Form */}
+                                {showAddFood === meal.id && (
+                                  <Card className="bg-white border border-emerald-200 mt-3">
+                                    <CardContent className="p-3">
+                                      <div className="space-y-3">
+                                        <Input
+                                          placeholder="Nome alimento"
+                                          value={newFoodName}
+                                          onChange={(e) => setNewFoodName(e.target.value)}
+                                        />
+                                        <div className="flex gap-2">
+                                          <Input
+                                            placeholder="Quantità"
+                                            value={newFoodQuantity}
+                                            onChange={(e) => setNewFoodQuantity(e.target.value)}
+                                            className="flex-1"
+                                          />
+                                          <Select value={newFoodUnit} onValueChange={setNewFoodUnit}>
+                                            <SelectTrigger className="w-20">
+                                              <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="g">g</SelectItem>
+                                              <SelectItem value="ml">ml</SelectItem>
+                                              <SelectItem value="pz">pz</SelectItem>
+                                              <SelectItem value="cucchiai">cucchiai</SelectItem>
+                                            </SelectContent>
+                                          </Select>
+                                        </div>
+                                        <div className="flex gap-2">
+                                          <Button
+                                            onClick={() => addFood(meal.id)}
+                                            size="sm"
+                                            className="flex-1 bg-emerald-500 hover:bg-emerald-600"
+                                            disabled={!newFoodName.trim() || !newFoodQuantity.trim()}
+                                          >
+                                            Aggiungi
+                                          </Button>
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setShowAddFood(null)}
+                                          >
+                                            <X className="h-4 w-4" />
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    </CardContent>
+                                  </Card>
+                                )}
                               </CardContent>
                             </Card>
-                          ) : (
-                            <Button
-                              onClick={() => setShowAddMeal(true)}
-                              variant="outline"
-                              className="w-full h-12 border-dashed border-2 border-emerald-300 hover:border-emerald-400 hover:bg-emerald-50 text-emerald-600"
-                            >
-                              <Plus className="h-4 w-4 mr-2" /> Aggiungi Nuovo Pasto
-                            </Button>
-                          )}
-                        </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-8 text-white/80">
+                            Nessun pasto per questo giorno
+                          </div>
+                        )}
+                        
+                        {/* Add Meal Section */}
+                        {showAddMeal ? (
+                          <Card className="bg-white/95 dark:bg-gray-800/95 rounded-2xl">
+                            <CardContent className="p-4">
+                              <div className="space-y-3">
+                                <Input
+                                  placeholder="Nome del pasto"
+                                  value={customMealName}
+                                  onChange={(e) => setCustomMealName(e.target.value)}
+                                  className="w-full"
+                                />
+                                <div className="flex gap-2">
+                                  <Button
+                                    onClick={addCustomMeal}
+                                    className="flex-1 bg-emerald-500 hover:bg-emerald-600"
+                                    disabled={!customMealName.trim()}
+                                  >
+                                    Crea Pasto
+                                  </Button>
+                                  <Button 
+                                    variant="outline" 
+                                    onClick={() => setShowAddMeal(false)}
+                                  >
+                                    Annulla
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ) : (
+                          <Button
+                            onClick={() => setShowAddMeal(true)}
+                            variant="outline"
+                            className="w-full h-12 border-dashed border-2 border-white/30 hover:border-white/50 hover:bg-white/10 text-white"
+                          >
+                            <Plus className="h-4 w-4 mr-2" /> Aggiungi Nuovo Pasto
+                          </Button>
+                        )}
                       </CardContent>
                     </Card>
                   </div>
 
                   {/* Next Day Card */}
-                  <div className="lg:block hidden">
-                    <Card className="bg-emerald-50 border border-emerald-200 h-full">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-lg text-emerald-700 text-center">
+                  <div className="col-span-12 md:col-span-3">
+                    <Card
+                      className="h-full bg-white/80 dark:bg-gray-800/80 rounded-3xl border-0 shadow-md cursor-pointer hover:shadow-lg transition-all"
+                      onClick={() => handleDayChange(selectedDayIndex + 1)}
+                    >
+                      <CardHeader className="text-center pb-3 border-b border-gray-200 dark:border-gray-700">
+                        <CardTitle className="text-lg font-bold text-gray-700 dark:text-gray-300">
                           {dayNamesFull[nextDayIndex]}
                         </CardTitle>
-                        <p className="text-sm text-emerald-600 text-center">
-                          {nextDayMeals.length} pasti
-                        </p>
                       </CardHeader>
-                      <CardContent className="p-4">
-                        <div 
-                          id="next-day-container"
-                          className="space-y-3 max-h-96 overflow-y-auto"
-                        >
-                          {nextDayMeals.length > 0 ? (
-                            nextDayMeals.map((meal: any, index: number) => (
-                              <Card 
-                                key={meal.id || index} 
-                                className={`bg-white border border-emerald-300 transition-all duration-200 ${
-                                  index === currentMealIndex ? 'ring-2 ring-emerald-500 shadow-lg bg-emerald-50' : ''
-                                }`}
-                                data-meal-index={index}
-                              >
-                                <CardContent className="p-3">
-                                  <h6 className="font-medium text-emerald-800 text-sm mb-2">
-                                    {meal.meal_name || meal.name || meal.type}
-                                  </h6>
-                                  <div className="space-y-1">
-                                    {(meal.food_items || meal.foods || []).map((food: any, foodIdx: number) => (
-                                      <div key={food.id || foodIdx} className="text-xs text-emerald-700 bg-emerald-100 p-1 rounded">
-                                        {food.name} - {food.quantity}{food.unit}
-                                      </div>
-                                    ))}
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            ))
-                          ) : (
-                            <div className="text-center py-8 text-emerald-400 text-sm">
-                              Nessun pasto configurato
+                      <CardContent
+                        id="next-day-container"
+                        className="p-4 space-y-3 max-h-[600px] overflow-y-auto scroll-smooth"
+                        style={{ scrollBehavior: "smooth" }}
+                      >
+                        {nextDayMeals.length > 0 ? (
+                          nextDayMeals.map((meal: any, index: number) => (
+                            <div
+                              key={meal.id || index}
+                              data-meal-index={index}
+                              className={`transition-all duration-300 rounded-xl p-3 ${
+                                index === currentMealIndex
+                                  ? "bg-emerald-100 dark:bg-emerald-900/30 ring-2 ring-emerald-400 shadow-lg transform scale-105"
+                                  : "bg-gray-50 dark:bg-gray-700/50"
+                              }`}
+                            >
+                              <h4 className="text-sm font-semibold text-gray-800 dark:text-white truncate">
+                                {meal.meal_name || meal.name || meal.type}
+                              </h4>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {(meal.food_items || meal.foods || []).length} alimenti - {meal.total_calories || meal.totalCalories || 0} kcal
+                              </p>
+                              {index === currentMealIndex && (
+                                <div className="mt-2 space-y-1 animate-fade-in-up">
+                                  {(meal.food_items || meal.foods || []).slice(0, 3).map((food: any, foodIdx: number) => (
+                                    <p key={food.id || foodIdx} className="text-xs text-gray-600 dark:text-gray-300 truncate">
+                                      • {food.name}
+                                    </p>
+                                  ))}
+                                  {(meal.food_items || meal.foods || []).length > 3 && (
+                                    <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                                      +{(meal.food_items || meal.foods || []).length - 3} altri
+                                    </p>
+                                  )}
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
+                          ))
+                        ) : (
+                          <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">Nessun pasto</p>
+                        )}
                       </CardContent>
                     </Card>
                   </div>
@@ -907,16 +932,20 @@ export default function Step4PreviewFixed({
                       disabled={isGeneratingAI}
                       size="sm"
                       variant="outline"
-                      className="text-purple-600 border-purple-200 hover:bg-purple-50 hover:border-purple-300"
+                      className={`transition-all duration-300 ${
+                        isGeneratingAI 
+                          ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white border-transparent animate-ai-loading shadow-ai-gradient' 
+                          : 'text-blue-600 border-blue-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-emerald-50 hover:border-blue-300 hover:shadow-ai-blue hover:scale-105 hover:text-blue-700'
+                      }`}
                     >
                       {isGeneratingAI ? (
                         <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          <Loader2 className="h-4 w-4 mr-2 animate-ai-spin" />
                           Generando...
                         </>
                       ) : (
                         <>
-                          <Wand2 className="h-4 w-4 mr-2" />
+                          <Wand2 className="h-4 w-4 mr-2 transition-all duration-1200 hover:rotate-12 hover:text-blue-600" />
                           Suggerisci con AI
                         </>
                       )}
@@ -1051,7 +1080,7 @@ export default function Step4PreviewFixed({
           >
             {isLoading ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="h-4 w-4 mr-2 animate-ai-spin" />
                 Creando Paziente...
               </>
             ) : (
