@@ -43,36 +43,40 @@ export default function Step1BasicInfo({
                  patientData.age && patientData.height && patientData.weight && patientData.mealCount
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen w-full bg-gradient-to-br from-primary-50 to-primary-100">
       <div className="w-full max-w-6xl mx-auto p-4 lg:p-8">
         <div className="flex items-center justify-between mb-6">
           <Button
             variant="ghost"
             size="icon"
             onClick={onBack}
-            className="rounded-full bg-emerald-400 text-white hover:bg-emerald-500 shadow-md"
+            className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-brand-primary"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">
             Nuovo Paziente - Informazioni Base
           </h1>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="rounded-full bg-gray-100 dark:bg-gray-800"
+            className="rounded-full bg-card hover:bg-accent-50 shadow-brand-soft border-accent-200"
           >
-            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            {theme === "dark" ? (
+              <Sun className="h-5 w-5 text-accent" />
+            ) : (
+              <Moon className="h-5 w-5 text-primary" />
+            )}
           </Button>
         </div>
 
-        <Card className="w-full bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg">
+        <Card className="w-full bg-card rounded-3xl border-primary-200 shadow-brand-primary">
           <CardContent className="p-8">
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  <Label htmlFor="name" className="text-sm font-medium text-primary-foreground mb-2 block">
                     Nome
                   </Label>
                   <Input
@@ -85,7 +89,7 @@ export default function Step1BasicInfo({
                 </div>
 
                 <div>
-                  <Label htmlFor="surname" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  <Label htmlFor="surname" className="text-sm font-medium text-foreground mb-2 block">
                     Cognome
                   </Label>
                   <Input
@@ -99,7 +103,7 @@ export default function Step1BasicInfo({
               </div>
 
               <div>
-                <Label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                <Label htmlFor="email" className="text-sm font-medium text-foreground mb-2 block">
                   Email
                 </Label>
                 <Input
@@ -114,7 +118,7 @@ export default function Step1BasicInfo({
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <Label htmlFor="age" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  <Label htmlFor="age" className="text-sm font-medium text-foreground mb-2 block">
                     Età
                   </Label>
                   <Input
@@ -128,7 +132,7 @@ export default function Step1BasicInfo({
                 </div>
 
                 <div>
-                  <Label htmlFor="height" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  <Label htmlFor="height" className="text-sm font-medium text-foreground mb-2 block">
                     Altezza (cm)
                   </Label>
                   <Input
@@ -142,7 +146,7 @@ export default function Step1BasicInfo({
                 </div>
 
                 <div>
-                  <Label htmlFor="weight" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  <Label htmlFor="weight" className="text-sm font-medium text-foreground mb-2 block">
                     Peso (kg)
                   </Label>
                   <Input
@@ -158,7 +162,7 @@ export default function Step1BasicInfo({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="gender" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  <Label htmlFor="gender" className="text-sm font-medium text-foreground mb-2 block">
                     Sesso
                   </Label>
                   <Select value={patientData.gender} onValueChange={(value) => setPatientData((prev: any) => ({ ...prev, gender: value }))}>
@@ -176,7 +180,7 @@ export default function Step1BasicInfo({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="targetCalories" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  <Label htmlFor="targetCalories" className="text-sm font-medium text-foreground mb-2 block">
                     Calorie Target
                   </Label>
                   <Input
@@ -190,7 +194,7 @@ export default function Step1BasicInfo({
                 </div>
 
                 <div>
-                  <Label htmlFor="mealCount" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  <Label htmlFor="mealCount" className="text-sm font-medium text-foreground mb-2 block">
                     Numero Pasti al Giorno
                   </Label>
                   <Select value={patientData.mealCount} onValueChange={(value) => setPatientData((prev: any) => ({ ...prev, mealCount: value }))}>
@@ -208,7 +212,7 @@ export default function Step1BasicInfo({
               </div>
 
               <div>
-                <Label htmlFor="mainGoal" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                <Label htmlFor="mainGoal" className="text-sm font-medium text-foreground mb-2 block">
                   Obiettivo Principale
                 </Label>
                 <Select value={patientData.mainGoal} onValueChange={(value) => setPatientData((prev: any) => ({ ...prev, mainGoal: value }))}>
@@ -225,7 +229,7 @@ export default function Step1BasicInfo({
               </div>
 
               <div>
-                <Label htmlFor="notes" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                <Label htmlFor="notes" className="text-sm font-medium text-foreground mb-2 block">
                   Note aggiuntive
                 </Label>
                 <Textarea
@@ -241,7 +245,7 @@ export default function Step1BasicInfo({
                 <Button
                   onClick={onNext}
                   disabled={!isValid}
-                  className="rounded-2xl px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold"
+                  className="rounded-2xl px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-brand-primary"
                 >
                   Continua
                 </Button>

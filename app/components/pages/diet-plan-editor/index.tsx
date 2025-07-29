@@ -431,30 +431,30 @@ export default function DietPlanEditor({
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen w-full bg-gradient-to-br from-secondary-50 to-secondary-100">
       <div className="w-full max-w-7xl mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
           <Button
             variant="ghost"
             size="icon"
             onClick={onBack}
-            className="rounded-full bg-emerald-400 text-white hover:bg-emerald-500 shadow-md"
+            className="rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-brand-secondary"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-secondary-600 to-secondary-700 bg-clip-text text-transparent">
             Modifica Piano Alimentare - {patient.name} {patient.surname}
           </h1>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+            className="rounded-full bg-card hover:bg-tertiary-50 shadow-brand-soft border-tertiary-200"
           >
             {theme === "dark" ? (
-              <Sun className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+              <Sun className="h-5 w-5 text-accent" />
             ) : (
-              <Moon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+              <Moon className="h-5 w-5 text-secondary" />
             )}
           </Button>
         </div>
@@ -463,11 +463,11 @@ export default function DietPlanEditor({
           {/* Previous Day */}
           <div className="col-span-12 md:col-span-3">
             <Card
-              className="h-full bg-white/80 dark:bg-gray-800/80 rounded-3xl border-0 shadow-md cursor-pointer hover:shadow-lg transition-all"
+              className="h-full bg-card/80 rounded-3xl border-tertiary-200 shadow-brand-soft cursor-pointer hover:shadow-brand-secondary transition-all hover:scale-105"
               onClick={() => handleDayChange(selectedDayIndex - 1)}
             >
-              <CardHeader className="text-center pb-3 border-b border-gray-200 dark:border-gray-700">
-                <CardTitle className="text-lg font-bold text-gray-700 dark:text-gray-300">
+              <CardHeader className="text-center pb-3 border-b border-tertiary-200">
+                <CardTitle className="text-lg font-bold text-muted-foreground">
                   {dayNamesFull[prevDayIndex]}
                 </CardTitle>
               </CardHeader>
@@ -483,25 +483,25 @@ export default function DietPlanEditor({
                       data-meal-index={index}
                       className={`transition-all duration-300 rounded-xl p-3 ${
                         index === currentMealIndex
-                          ? "bg-emerald-100 dark:bg-emerald-900/30 ring-2 ring-emerald-400 shadow-lg transform scale-105"
-                          : "bg-gray-50 dark:bg-gray-700/50"
+                          ? "bg-secondary-100 ring-2 ring-secondary-400 shadow-brand-secondary transform scale-105"
+                          : "bg-card/70 border border-secondary-200"
                       }`}
                     >
-                      <h4 className="text-sm font-semibold text-gray-800 dark:text-white truncate">
+                      <h4 className="text-sm font-semibold text-secondary-foreground truncate">
                         {meal.meal_name}
                       </h4>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-muted-foreground">
                         {meal.food_items.length} alimenti - {meal.total_calories} kcal
                       </p>
                       {index === currentMealIndex && (
                         <div className="mt-2 space-y-1 animate-fade-in-up">
                           {meal.food_items.slice(0, 3).map((food) => (
-                            <p key={food.id} className="text-xs text-gray-600 dark:text-gray-300 truncate">
+                            <p key={food.id} className="text-xs text-tertiary-foreground truncate">
                               • {food.name}
                             </p>
                           ))}
                           {meal.food_items.length > 3 && (
-                            <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                            <p className="text-xs text-secondary-600">
                               +{meal.food_items.length - 3} altri
                             </p>
                           )}
@@ -510,7 +510,7 @@ export default function DietPlanEditor({
                     </div>
                   ))
                 ) : (
-                  <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">Nessun pasto</p>
+                  <p className="text-center text-sm text-muted-foreground py-8">Nessun pasto</p>
                 )}
               </CardContent>
             </Card>
@@ -519,36 +519,36 @@ export default function DietPlanEditor({
           {/* Current Day */}
           <div className="col-span-12 md:col-span-6">
             <Card
-              className={`h-full bg-emerald-400 text-white rounded-3xl border-0 shadow-xl transition-all duration-300 ${
+              className={`h-full bg-secondary rounded-3xl border-secondary-300 shadow-brand-secondary transition-all duration-300 ${
                 isTransitioning
                   ? `transform ${transitionDirection === "right" ? "translate-x-4" : "-translate-x-4"} opacity-75`
                   : "translate-x-0 opacity-100"
               }`}
             >
-              <CardHeader className="text-center pb-4 border-b border-emerald-300">
-                <CardTitle className="text-3xl font-bold">
+              <CardHeader className="text-center pb-4 border-b border-secondary-300">
+                <CardTitle className="text-3xl font-bold text-secondary-foreground">
                   {dayNamesFull[selectedDayIndex]}
                 </CardTitle>
-                <p className="text-emerald-100 text-lg mt-1">Oggi</p>
+                <p className="text-secondary-200 text-lg mt-1">Oggi</p>
               </CardHeader>
               <CardContent className="p-6 space-y-4 max-h-[600px] overflow-y-auto scroll-smooth">
                 {currentDayMeals.map((meal, mealIndex) => (
                   <Card
                     key={`${selectedDayIndex}-${meal.id}-${mealIndex}-${meal.created_at || Date.now()}`}
                     data-meal-index={mealIndex}
-                    className={`bg-white/95 dark:bg-gray-800/95 rounded-2xl border-0 shadow-lg transition-all duration-300 ${
-                      mealIndex === currentMealIndex ? "ring-2 ring-white shadow-2xl" : ""
+                    className={`bg-card/95 rounded-2xl border-secondary-200 shadow-brand-soft transition-all duration-300 ${
+                      mealIndex === currentMealIndex ? "ring-2 ring-accent shadow-brand-primary" : ""
                     }`}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-lg font-bold text-gray-800 dark:text-white">{meal.meal_name}</h3>
+                        <h3 className="text-lg font-bold text-card-foreground">{meal.meal_name}</h3>
                         <div className="flex items-center gap-2">
-                          <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300">
+                          <Badge className="bg-secondary-100 text-secondary-700 border-secondary-300">
                             {meal.total_calories} kcal
                           </Badge>
                           {mealIndex === currentMealIndex && (
-                            <Badge className="bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300 animate-pulse">
+                            <Badge className="bg-accent-100 text-accent-700 border-accent-300 animate-pulse">
                               In Focus
                             </Badge>
                           )}
@@ -559,10 +559,10 @@ export default function DietPlanEditor({
                         {meal.food_items.map((food) => (
                           <div
                             key={`${selectedDayIndex}-${meal.id}-${food.id}`}
-                            className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 border border-gray-200 dark:border-gray-600"
+                            className="bg-card/70 rounded-lg p-3 border border-secondary-200"
                           >
                             <div className="flex items-center justify-between">
-                              <span className="font-medium text-gray-800 dark:text-white text-sm">
+                              <span className="font-medium text-card-foreground text-sm">
                                 {food.name} - {food.quantity}{food.unit}
                               </span>
                               <div className="flex items-center gap-2">
@@ -573,7 +573,7 @@ export default function DietPlanEditor({
                                     setSelectedFoodForAlternatives({ mealId: meal.id, foodId: food.id, food })
                                     setShowAlternativesSheet(true)
                                   }}
-                                  className="h-6 w-6 text-blue-500 hover:bg-blue-100"
+                                  className="h-6 w-6 text-tertiary hover:bg-tertiary-100"
                                 >
                                   <Edit className="h-3 w-3" />
                                 </Button>
@@ -581,15 +581,15 @@ export default function DietPlanEditor({
                                   variant="ghost"
                                   size="icon"
                                   onClick={() => deleteFood(meal.id, food.id)}
-                                  className="h-6 w-6 text-red-500 hover:bg-red-100"
+                                  className="h-6 w-6 text-destructive hover:bg-destructive/10"
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
                             </div>
                             {food.alternatives && food.alternatives.length > 0 && (
-                              <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-                                <p className="text-xs text-blue-600 dark:text-blue-400">
+                              <div className="mt-2 pt-2 border-t border-secondary-200">
+                                <p className="text-xs text-tertiary-600">
                                   {food.alternatives.length} alternative disponibili
                                 </p>
                               </div>
@@ -599,22 +599,22 @@ export default function DietPlanEditor({
                       </div>
 
                       {showAddFood === meal.id ? (
-                        <div className="space-y-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 mt-3">
+                        <div className="space-y-3 bg-card/70 rounded-lg p-3 mt-3 border border-secondary-200">
                           <Input
                             placeholder="Nome alimento"
                             value={newFoodName}
                             onChange={(e) => setNewFoodName(e.target.value)}
-                            className="h-8 text-sm"
+                            className="h-8 text-sm border-secondary-300 focus:border-secondary"
                           />
                           <div className="grid grid-cols-2 gap-2">
                             <Input
                               placeholder="Quantità"
                               value={newFoodQuantity}
                               onChange={(e) => setNewFoodQuantity(e.target.value)}
-                              className="h-8 text-sm"
+                              className="h-8 text-sm border-secondary-300 focus:border-secondary"
                             />
                             <Select value={newFoodUnit} onValueChange={setNewFoodUnit}>
-                              <SelectTrigger className="h-8 text-sm">
+                              <SelectTrigger className="h-8 text-sm border-secondary-300">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
@@ -629,7 +629,7 @@ export default function DietPlanEditor({
                             <Button
                               size="sm"
                               onClick={() => addFood(meal.id)}
-                              className="flex-1 bg-emerald-500 hover:bg-emerald-600 h-8 text-xs"
+                              className="flex-1 bg-secondary hover:bg-secondary/90 h-8 text-xs text-secondary-foreground"
                               disabled={!newFoodName || !newFoodQuantity}
                             >
                               Aggiungi
@@ -638,7 +638,7 @@ export default function DietPlanEditor({
                               variant="outline"
                               size="sm"
                               onClick={() => setShowAddFood(null)}
-                              className="h-8 text-xs"
+                              className="h-8 text-xs border-secondary-300 text-secondary-foreground hover:bg-secondary-50"
                             >
                               Annulla
                             </Button>
@@ -659,7 +659,7 @@ export default function DietPlanEditor({
                 ))}
 
                 {showAddMeal ? (
-                  <Card className="bg-white/95 dark:bg-gray-800/95 rounded-2xl">
+                  <Card className="bg-card/95 rounded-2xl border-secondary-200">
                     <CardContent className="p-4">
                       <div className="space-y-2">
                         <Input
@@ -672,7 +672,7 @@ export default function DietPlanEditor({
                               addCustomMeal()
                             }
                           }}
-                          className="w-full h-8 text-sm"
+                          className="w-full h-8 text-sm border-secondary-300 focus:border-secondary"
                           disabled={isCreatingMeal}
                         />
                         <div className="flex gap-2">
@@ -682,7 +682,7 @@ export default function DietPlanEditor({
                                 addCustomMeal()
                               }
                             }}
-                            className="flex-1 bg-emerald-500 hover:bg-emerald-600 h-8 text-xs"
+                            className="flex-1 bg-secondary hover:bg-secondary/90 h-8 text-xs text-secondary-foreground"
                             disabled={!customMealName.trim() || isCreatingMeal}
                           >
                             {isCreatingMeal ? "Creando..." : "Crea Pasto"}
@@ -695,7 +695,7 @@ export default function DietPlanEditor({
                                 setCustomMealName("")
                               }
                             }} 
-                            className="h-8 text-xs"
+                            className="h-8 text-xs border-secondary-300 hover:bg-secondary-50"
                             disabled={isCreatingMeal}
                           >
                             Annulla
@@ -708,7 +708,7 @@ export default function DietPlanEditor({
                   <Button
                     onClick={() => setShowAddMeal(true)}
                     variant="outline"
-                    className="w-full h-12 border-dashed border-2 border-emerald-300 hover:border-emerald-400 hover:bg-emerald-50 text-emerald-600"
+                    className="w-full h-12 border-dashed border-2 border-secondary-300 hover:border-secondary-400 hover:bg-secondary-50 text-secondary-600"
                   >
                     <Plus className="h-4 w-4 mr-2" /> Aggiungi Nuovo Pasto
                   </Button>
@@ -720,11 +720,11 @@ export default function DietPlanEditor({
           {/* Next Day */}
           <div className="col-span-12 md:col-span-3">
             <Card
-              className="h-full bg-white/80 dark:bg-gray-800/80 rounded-3xl border-0 shadow-md cursor-pointer hover:shadow-lg transition-all"
+              className="h-full bg-card/80 rounded-3xl border-tertiary-200 shadow-brand-soft cursor-pointer hover:shadow-brand-secondary transition-all hover:scale-105"
               onClick={() => handleDayChange(selectedDayIndex + 1)}
             >
-              <CardHeader className="text-center pb-3 border-b border-gray-200 dark:border-gray-700">
-                <CardTitle className="text-lg font-bold text-gray-700 dark:text-gray-300">
+              <CardHeader className="text-center pb-3 border-b border-tertiary-200">
+                <CardTitle className="text-lg font-bold text-muted-foreground">
                   {dayNamesFull[nextDayIndex]}
                 </CardTitle>
               </CardHeader>
@@ -740,25 +740,25 @@ export default function DietPlanEditor({
                       data-meal-index={index}
                       className={`transition-all duration-300 rounded-xl p-3 ${
                         index === currentMealIndex
-                          ? "bg-emerald-100 dark:bg-emerald-900/30 ring-2 ring-emerald-400 shadow-lg transform scale-105"
-                          : "bg-gray-50 dark:bg-gray-700/50"
+                          ? "bg-secondary-100 ring-2 ring-secondary-400 shadow-brand-secondary transform scale-105"
+                          : "bg-card/70 border border-secondary-200"
                       }`}
                     >
-                      <h4 className="text-sm font-semibold text-gray-800 dark:text-white truncate">
+                      <h4 className="text-sm font-semibold text-secondary-foreground truncate">
                         {meal.meal_name}
                       </h4>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-muted-foreground">
                         {meal.food_items.length} alimenti - {meal.total_calories} kcal
                       </p>
                       {index === currentMealIndex && (
                         <div className="mt-2 space-y-1 animate-fade-in-up">
                           {meal.food_items.slice(0, 3).map((food) => (
-                            <p key={food.id} className="text-xs text-gray-600 dark:text-gray-300 truncate">
+                            <p key={food.id} className="text-xs text-tertiary-foreground truncate">
                               • {food.name}
                             </p>
                           ))}
                           {meal.food_items.length > 3 && (
-                            <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                            <p className="text-xs text-secondary-600">
                               +{meal.food_items.length - 3} altri
                             </p>
                           )}
@@ -767,7 +767,7 @@ export default function DietPlanEditor({
                     </div>
                   ))
                 ) : (
-                  <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">Nessun pasto</p>
+                  <p className="text-center text-sm text-muted-foreground py-8">Nessun pasto</p>
                 )}
               </CardContent>
             </Card>
@@ -776,8 +776,8 @@ export default function DietPlanEditor({
 
         {/* Meal Navigation Indicator */}
         <div className="mt-4 flex justify-center">
-          <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 rounded-full px-4 py-2 shadow-lg">
-            <span className="text-sm text-gray-600 dark:text-gray-300">Pasto:</span>
+          <div className="flex items-center gap-2 bg-card/80 rounded-full px-4 py-2 shadow-brand-soft border border-secondary-200">
+            <span className="text-sm text-muted-foreground">Pasto:</span>
             {currentDayMeals.map((_, index) => (
               <button
                 key={index}

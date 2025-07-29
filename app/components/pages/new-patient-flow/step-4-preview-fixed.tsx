@@ -670,7 +670,7 @@ export default function Step4PreviewFixed({
                                           <Button
                                             variant="ghost"
                                             size="sm"
-                                            className="h-6 w-6 p-0 text-blue-500 hover:bg-blue-100"
+                                            className="h-6 w-6 p-0 text-secondary-500 hover:bg-secondary-100"
                                             onClick={() => setSelectedFoodForAlternatives({ mealId: meal.id, foodId: food.id, food })}
                                           >
                                             <Edit className="h-3 w-3" />
@@ -687,7 +687,7 @@ export default function Step4PreviewFixed({
                                       </div>
                                       {food.alternatives && food.alternatives.length > 0 && (
                                         <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-                                          <p className="text-xs text-blue-600 dark:text-blue-400">
+                                          <p className="text-xs text-primary-600 dark:text-primary-400">
                                             {food.alternatives.length} alternative disponibili
                                           </p>
                                         </div>
@@ -934,8 +934,8 @@ export default function Step4PreviewFixed({
                       variant="outline"
                       className={`transition-all duration-300 ${
                         isGeneratingAI 
-                          ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white border-transparent animate-ai-loading shadow-ai-gradient' 
-                          : 'text-blue-600 border-blue-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-emerald-50 hover:border-blue-300 hover:shadow-ai-blue hover:scale-105 hover:text-blue-700'
+                          ? 'bg-gradient-to-r from-secondary-500 to-primary-500 text-white border-transparent animate-brand-loading shadow-brand-gradient' 
+                          : 'text-secondary-600 border-secondary-200 hover:bg-gradient-to-r hover:from-secondary-50 hover:to-primary-50 hover:border-secondary-300 hover:shadow-brand-secondary hover:scale-105 hover:text-secondary-700'
                       }`}
                     >
                       {isGeneratingAI ? (
@@ -945,7 +945,7 @@ export default function Step4PreviewFixed({
                         </>
                       ) : (
                         <>
-                          <Wand2 className="h-4 w-4 mr-2 transition-all duration-1200 hover:rotate-12 hover:text-blue-600" />
+                          <Wand2 className="h-4 w-4 mr-2 transition-all duration-1200 hover:rotate-12 hover:text-secondary-600" />
                           Suggerisci con AI
                         </>
                       )}
@@ -954,17 +954,17 @@ export default function Step4PreviewFixed({
                   
                   {/* AI Suggestions */}
                   {showAISuggestions && aiSuggestions.length > 0 && (
-                    <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                      <h5 className="font-medium text-purple-800 mb-3 flex items-center">
+                    <div className="mb-6 p-4 bg-accent-50 dark:bg-accent-900/20 border border-accent-200 dark:border-accent-700 rounded-lg">
+                      <h5 className="font-medium text-accent-800 dark:text-accent-300 mb-3 flex items-center">
                         <Wand2 className="h-4 w-4 mr-2" />
                         Alternative suggerite dall'AI:
                       </h5>
                       <div className="space-y-2 mb-4">
                         {aiSuggestions.map((suggestion, index) => (
-                          <div key={index} className="flex items-center justify-between p-3 bg-white border border-purple-200 rounded-lg">
+                          <div key={index} className="flex items-center justify-between p-3 bg-card border border-accent-200 dark:border-accent-700 rounded-lg">
                             <div>
-                              <span className="font-medium text-purple-800">{suggestion.name}</span>
-                              <span className="text-purple-600 ml-2">
+                              <span className="font-medium text-accent-800 dark:text-accent-300">{suggestion.name}</span>
+                              <span className="text-accent-600 dark:text-accent-400 ml-2">
                                 {suggestion.quantity}{suggestion.unit} • {suggestion.calories} kcal
                               </span>
                             </div>
@@ -975,7 +975,7 @@ export default function Step4PreviewFixed({
                         <Button
                           onClick={acceptAISuggestions}
                           size="sm"
-                          className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
+                          className="flex-1 bg-accent-600 hover:bg-accent-700 text-white"
                         >
                           <Check className="h-4 w-4 mr-2" />
                           Aggiungi Alternative
@@ -984,7 +984,7 @@ export default function Step4PreviewFixed({
                           onClick={rejectAISuggestions}
                           size="sm"
                           variant="outline"
-                          className="flex-1 border-purple-200 text-purple-600 hover:bg-purple-50"
+                          className="flex-1 border-accent-200 text-accent-600 hover:bg-accent-50 dark:border-accent-700 dark:text-accent-400 dark:hover:bg-accent-900/20"
                         >
                           <X className="h-4 w-4 mr-2" />
                           Rifiuta

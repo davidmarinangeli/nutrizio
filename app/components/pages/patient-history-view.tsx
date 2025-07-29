@@ -136,12 +136,12 @@ export default function PatientHistoryView({ patient, onBack }: PatientHistoryVi
   }
 
   const getEngagementColor = (feedbackCount: number) => {
-    if (feedbackCount === 0) return "bg-gray-100 dark:bg-gray-800 text-gray-400"
-    if (feedbackCount === 1) return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700"
-    if (feedbackCount === 2) return "bg-emerald-200 dark:bg-emerald-900/50 text-emerald-800"
-    if (feedbackCount === 3) return "bg-emerald-300 dark:bg-emerald-800/70 text-emerald-900"
-    if (feedbackCount === 4) return "bg-emerald-400 dark:bg-emerald-700 text-white"
-    return "bg-emerald-500 dark:bg-emerald-600 text-white"
+    if (feedbackCount === 0) return "bg-muted text-muted-foreground"
+    if (feedbackCount === 1) return "bg-tertiary-100 text-tertiary-700"
+    if (feedbackCount === 2) return "bg-tertiary-200 text-tertiary-800"
+    if (feedbackCount === 3) return "bg-tertiary-300 text-tertiary-900"
+    if (feedbackCount === 4) return "bg-tertiary text-tertiary-foreground"
+    return "bg-tertiary-600 text-white"
   }
 
   const hasDietPlanChange = (date: Date) => {

@@ -80,10 +80,10 @@ export default function DietitiansAppRouter() {
   // Show loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen w-full flex items-center justify-center bg-background">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Caricamento in corso...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Caricamento in corso...</p>
         </div>
       </div>
     )
@@ -92,10 +92,10 @@ export default function DietitiansAppRouter() {
   // Show error state
   if (error) {
     return (
-      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-red-50 dark:bg-red-900 text-red-800 dark:text-red-200 p-4">
+      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-destructive/5 text-destructive p-4">
         <h2 className="text-xl font-bold mb-4">Errore di Caricamento</h2>
         <p className="text-center mb-4">{error}</p>
-        <Button onClick={() => window.location.reload()} className="bg-red-600 hover:bg-red-700 text-white">
+        <Button onClick={() => window.location.reload()} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
           Riprova
         </Button>
       </div>

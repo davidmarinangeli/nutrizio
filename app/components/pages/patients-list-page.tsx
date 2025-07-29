@@ -33,28 +33,28 @@ export default function PatientsListPage({
   )
 
   const getComplianceColor = (compliance: number) => {
-    if (compliance >= 90) return "bg-emerald-400"
-    if (compliance >= 70) return "bg-yellow-400"
-    return "bg-red-400"
+    if (compliance >= 90) return "bg-primary"
+    if (compliance >= 70) return "bg-accent"
+    return "bg-destructive"
   }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
         return (
-          <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300 rounded-full">
+          <Badge className="bg-primary-100 text-primary-700 rounded-full">
             Attivo
           </Badge>
         )
       case "inactive":
         return (
-          <Badge className="bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded-full">
+          <Badge className="bg-muted text-muted-foreground rounded-full">
             Inattivo
           </Badge>
         )
       case "new":
         return (
-          <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 rounded-full">
+          <Badge className="bg-accent-100 text-accent-700 rounded-full">
             Nuovo
           </Badge>
         )
@@ -64,36 +64,38 @@ export default function PatientsListPage({
   }
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900 animate-fade-in-up">
-      {/* Modern Header with Gradient Background */}
-      <div className="w-full bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 dark:from-emerald-600 dark:via-emerald-700 dark:to-teal-800 relative overflow-hidden animate-fade-in-down">
+    <div className="min-h-screen w-full bg-background animate-fade-in-up">
+      {/* Modern Header with Brand Gradient Background */}
+      <div className="w-full bg-brand-gradient relative overflow-hidden animate-fade-in-down">
         {/* Background decoration */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-y-1 scale-110 animate-pulse-glow"></div>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-32 translate-x-32 animate-bounce-gentle"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24 animate-bounce-gentle" style={{animationDelay: '1s'}}></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-foreground/10 to-transparent transform -skew-y-1 scale-110 animate-pulse-glow"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary-foreground/5 rounded-full -translate-y-32 translate-x-32 animate-bounce-gentle"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary-foreground/5 rounded-full translate-y-24 -translate-x-24 animate-bounce-gentle" style={{animationDelay: '1s'}}></div>
         
+        {/* Content container with backdrop blur for better contrast */}
         <div className="relative w-full max-w-7xl mx-auto p-4 lg:p-8 py-12 lg:py-16">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex-1 animate-fade-in-left">
-              <h1 className="text-4xl lg:text-5xl font-bold text-white mb-2 bg-gradient-to-r from-white to-emerald-100 bg-clip-text text-transparent">
-                Ciao, Dr. Nutrizionista! 👋
-              </h1>
-              <p className="text-emerald-100 text-lg lg:text-xl font-medium">
-                Benvenuto nella tua dashboard. Gestisci i tuoi pazienti con facilità.
-              </p>
-            </div>
-            <div className="flex items-center gap-4 animate-fade-in-right">
+          <div className="backdrop-blur-sm bg-primary-foreground/10 rounded-3xl p-6 lg:p-8 border border-primary-foreground/20 shadow-brand-soft">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex-1 animate-fade-in-left">
+                <h1 className="text-4xl lg:text-5xl font-bold text-primary-foreground mb-2 drop-shadow-sm">
+                  Ciao, Dr. Nutrizionista! 👋
+                </h1>
+                <p className="text-primary-foreground/90 text-lg lg:text-xl font-medium drop-shadow-sm">
+                  Benvenuto nella tua dashboard. Gestisci i tuoi pazienti con facilità.
+                </p>
+              </div>
+              <div className="flex items-center gap-4 animate-fade-in-right">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border-0 shadow-lg transition-all duration-300 hover:scale-110 hover:rotate-180"
+                className="rounded-full bg-primary-foreground/20 hover:bg-primary-foreground/30 backdrop-blur-sm text-primary-foreground border-0 shadow-brand-soft transition-all duration-300 hover:scale-110 hover:rotate-180"
               >
                 {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </Button>
               <Button
                 onClick={onCreateNewPatient}
-                className="rounded-full bg-white text-emerald-600 hover:bg-white/90 shadow-lg font-semibold px-6 py-2 h-12 transition-all duration-300 hover:scale-105 hover:shadow-glow"
+                className="rounded-full bg-accent text-accent-foreground hover:bg-accent/90 shadow-brand-accent font-semibold px-6 py-2 h-12 transition-all duration-300 hover:scale-105 hover:shadow-brand-glow"
               >
                 <Plus className="h-4 w-4 mr-2" /> Nuovo Paziente
               </Button>
@@ -102,68 +104,69 @@ export default function PatientsListPage({
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-white animate-scale-in" style={{animationDelay: '0.1s'}}>
+            <div className="bg-primary-foreground/20 backdrop-blur-sm rounded-2xl p-6 text-primary-foreground animate-scale-in" style={{animationDelay: '0.1s'}}>
               <div className="text-3xl font-bold mb-1">{patients.length}</div>
-              <div className="text-emerald-100">Pazienti Totali</div>
+              <div className="text-primary-foreground/80">Pazienti Totali</div>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-white animate-scale-in" style={{animationDelay: '0.2s'}}>
-              <div className="text-3xl font-bold mb-1">
+            <div className="bg-primary-foreground/20 backdrop-blur-sm rounded-2xl p-6 text-primary-foreground animate-scale-in" style={{animationDelay: '0.2s'}}>
+              <div className="text-3xl font-bold mb-1 text-accent-foreground">
                 {patients.filter(p => p.status === 'active').length}
               </div>
-              <div className="text-emerald-100">Pazienti Attivi</div>
+              <div className="text-primary-foreground/80">Pazienti Attivi</div>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-white animate-scale-in" style={{animationDelay: '0.3s'}}>
-              <div className="text-3xl font-bold mb-1">
+            <div className="bg-primary-foreground/20 backdrop-blur-sm rounded-2xl p-6 text-primary-foreground animate-scale-in" style={{animationDelay: '0.3s'}}>
+              <div className="text-3xl font-bold mb-1 text-primary-foreground">
                 {patients.length > 0 ? Math.round(patients.reduce((sum, p) => sum + p.compliance, 0) / patients.length) : 0}%
               </div>
-              <div className="text-emerald-100">Compliance Media</div>
+              <div className="text-primary-foreground/80">Compliance Media</div>
             </div>
           </div>
 
           {/* Search Bar */}
+                    {/* Search Bar */}
           <div className="max-w-md animate-fade-in-up" style={{animationDelay: '0.4s'}}>
             <Input
-              type="search"
-              placeholder="Cerca paziente..."
+              placeholder="Cerca pazienti..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-2xl h-12 bg-white/20 backdrop-blur-sm border-white/30 text-white placeholder:text-emerald-100 focus:bg-white/30 focus:border-white/50"
+              className="w-full rounded-2xl h-12 bg-primary-foreground/20 backdrop-blur-sm border-primary-foreground/30 text-primary-foreground placeholder:text-primary-foreground/60 focus:bg-primary-foreground/30 focus:border-primary-foreground/50"
             />
           </div>
         </div>
       </div>
+      </div>
 
-      {/* Content Area */}
-      <div className="w-full max-w-7xl mx-auto p-4 lg:p-8 -mt-6">
+      {/* Content Area with better padding below header */}
+      <div className="w-full max-w-7xl mx-auto p-4 lg:p-8 pt-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPatients.map((patient, index) => (
             <Card
               key={patient.id}
-              className="bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg cursor-pointer"
+              className="bg-card rounded-3xl border-tertiary-200 shadow-brand-soft cursor-pointer hover:shadow-brand-primary transition-all duration-300 hover:scale-105"
               onClick={() => onSelectPatient(patient)}
             >
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <CardTitle className="text-lg font-semibold text-gray-800 dark:text-white">
+                    <CardTitle className="text-lg font-semibold text-foreground">
                       {patient.name} {patient.surname}
                     </CardTitle>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">{patient.email}</p>
+                    <p className="text-muted-foreground text-sm">{patient.email}</p>
                   </div>
                   <div>
                     {getStatusBadge(patient.status)}
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Età: <span className="font-medium">{patient.age} anni</span>
+                  <p className="text-sm text-muted-foreground">
+                    Età: <span className="font-medium text-foreground">{patient.age} anni</span>
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Peso: <span className="font-medium">{patient.weight} kg</span>
+                  <p className="text-sm text-muted-foreground">
+                    Peso: <span className="font-medium text-foreground">{patient.weight} kg</span>
                   </p>
                   <div className="flex items-center gap-2">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Compliance:</p>
-                    <Badge className={`${getComplianceColor(patient.compliance)} text-white rounded-full`}>
+                    <p className="text-sm text-muted-foreground">Compliance:</p>
+                    <Badge className={`${getComplianceColor(patient.compliance)} text-white rounded-full shadow-sm`}>
                       {patient.compliance}%
                     </Badge>
                   </div>

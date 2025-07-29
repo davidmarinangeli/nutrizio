@@ -57,7 +57,7 @@ export default function Step2Restrictions({
   ]
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen w-full bg-background">
       <div className="w-full max-w-6xl mx-auto p-4 lg:p-8">
         <div className="flex items-center justify-between mb-6">
           <Button

@@ -51,19 +51,19 @@ export default function PatientDetailPage({
     switch (status) {
       case "active":
         return (
-          <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300 rounded-full">
+          <Badge className="bg-primary-100 text-primary-700 rounded-full">
             Attivo
           </Badge>
         )
       case "inactive":
         return (
-          <Badge className="bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded-full">
+          <Badge className="bg-muted text-muted-foreground rounded-full">
             Inattivo
           </Badge>
         )
       case "new":
         return (
-          <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 rounded-full">
+          <Badge className="bg-accent-100 text-accent-700 rounded-full">
             Nuovo
           </Badge>
         )
@@ -77,18 +77,18 @@ export default function PatientDetailPage({
   }
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900 animate-fade-in-up">
+    <div className="min-h-screen w-full bg-background animate-fade-in-up">
       <div className="w-full max-w-7xl mx-auto p-4 lg:p-8">
         <div className="flex items-center justify-between mb-6 animate-fade-in-down">
           <Button
             variant="ghost"
             size="icon"
             onClick={onBack}
-            className="rounded-full bg-emerald-400 text-white hover:bg-emerald-500 shadow-md transition-all duration-300 hover:scale-110 hover:-translate-x-1"
+            className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-brand-primary transition-all duration-300 hover:scale-110 hover:-translate-x-1"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent animate-scale-in">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent animate-scale-in">
             Dettaglio Paziente
           </h1>
           <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ export default function PatientDetailPage({
               variant="ghost"
               size="icon"
               onClick={() => setShowHistoryView(true)}
-              className="rounded-full bg-blue-400 text-white hover:bg-blue-500 shadow-md transition-all duration-300 hover:scale-110 animate-fade-in-right"
+              className="rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-brand-secondary transition-all duration-300 hover:scale-110 animate-fade-in-right"
               title="Visualizza storico paziente"
               style={{animationDelay: '0.1s'}}
             >
@@ -106,7 +106,7 @@ export default function PatientDetailPage({
               variant="ghost"
               size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="rounded-full bg-gray-100 dark:bg-gray-800 transition-all duration-300 hover:scale-110 hover:rotate-180 animate-fade-in-right"
+              className="rounded-full bg-muted hover:bg-muted/80 transition-all duration-300 hover:scale-110 hover:rotate-180 animate-fade-in-right"
               style={{animationDelay: '0.2s'}}
             >
               {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
@@ -115,65 +115,65 @@ export default function PatientDetailPage({
         </div>
 
         {/* Patient Info Card */}
-        <Card className="w-full bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg mb-6 animate-fade-in-up">
+        <Card className="w-full bg-card rounded-3xl border-0 shadow-lg mb-6 animate-fade-in-up">
           <CardContent className="p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
+                <h2 className="text-2xl font-bold text-foreground mb-2">
                   {patient.name} {patient.surname}
                 </h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">{patient.email}</p>
+                <p className="text-muted-foreground mb-4">{patient.email}</p>
                 <div className="flex items-center gap-4 mb-4">
                   {getStatusBadge(patient.status)}
                 </div>
                 <div className="space-y-3">
                   <p>
-                    <span className="text-sm text-gray-500">Età:</span>{" "}
+                    <span className="text-sm text-muted-foreground">Età:</span>{" "}
                     <span className="font-semibold">{patient.age} anni</span>
                   </p>
                   <p>
-                    <span className="text-sm text-gray-500">Altezza/Peso:</span>{" "}
+                    <span className="text-sm text-muted-foreground">Altezza/Peso:</span>{" "}
                     <span className="font-semibold">
                       {patient.height}cm / {patient.weight}kg
                     </span>
                   </p>
                   <p>
-                    <span className="text-sm text-gray-500">Ultimo accesso:</span>{" "}
+                    <span className="text-sm text-muted-foreground">Ultimo accesso:</span>{" "}
                     <span className="font-semibold">{patient.last_access}</span>
                   </p>
                 </div>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center">
-                  <Award className="h-5 w-5 mr-2 text-emerald-400" />
+                <h3 className="text-lg font-bold text-foreground mb-4 flex items-center">
+                  <Award className="h-5 w-5 mr-2 text-primary" />
                   Compliance del Paziente
                 </h3>
                 <div className="space-y-4">
                   {/* Main Score */}
-                  <Card className="bg-emerald-400 text-white rounded-2xl border-0 shadow-md">
+                  <Card className="bg-brand-gradient text-primary-foreground rounded-2xl border-0 shadow-brand-primary">
                     <CardContent className="p-6 text-center">
-                      <Award className="h-12 w-12 mx-auto mb-3 text-emerald-100" />
+                      <Award className="h-12 w-12 mx-auto mb-3 text-primary-foreground/80" />
                       <div className="text-4xl font-bold mb-1">{patient.compliance}</div>
-                      <div className="text-emerald-100 text-sm">Punteggio Compliance</div>
+                      <div className="text-primary-foreground/80 text-sm">Punteggio Compliance</div>
                     </CardContent>
                   </Card>
                   
                   {/* Stats Grid */}
                   <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 text-center">
-                      <Check className="h-6 w-6 mx-auto mb-2 text-emerald-400" />
-                      <div className="text-lg font-bold text-gray-800 dark:text-white">18</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-300">Pasti completati</div>
+                    <div className="bg-muted rounded-xl p-3 text-center">
+                      <Check className="h-6 w-6 mx-auto mb-2 text-primary" />
+                      <div className="text-lg font-bold text-foreground">18</div>
+                      <div className="text-xs text-muted-foreground">Pasti completati</div>
                     </div>
-                    <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 text-center">
-                      <Star className="h-6 w-6 mx-auto mb-2 text-emerald-400" />
-                      <div className="text-lg font-bold text-gray-800 dark:text-white">4.3</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-300">Rating medio</div>
+                    <div className="bg-muted rounded-xl p-3 text-center">
+                      <Star className="h-6 w-6 mx-auto mb-2 text-primary" />
+                      <div className="text-lg font-bold text-foreground">4.3</div>
+                      <div className="text-xs text-muted-foreground">Rating medio</div>
                     </div>
-                    <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 text-center">
-                      <Award className="h-6 w-6 mx-auto mb-2 text-emerald-400" />
-                      <div className="text-lg font-bold text-gray-800 dark:text-white">3</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-300">Target raggiunti</div>
+                    <div className="bg-muted rounded-xl p-3 text-center">
+                      <Award className="h-6 w-6 mx-auto mb-2 text-primary-400" />
+                      <div className="text-lg font-bold text-foreground">3</div>
+                      <div className="text-xs text-muted-foreground">Target raggiunti</div>
                     </div>
                   </div>
                 </div>
@@ -183,13 +183,13 @@ export default function PatientDetailPage({
         </Card>
 
         {/* Weekly Plan View */}
-        <Card className="w-full bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg animate-fade-in-up">
+        <Card className="w-full bg-card rounded-3xl border-0 shadow-lg animate-fade-in-up">
           <CardHeader className="animate-fade-in-down">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-xl font-bold text-gray-800 dark:text-white">
+              <CardTitle className="text-xl font-bold text-foreground">
                 Piano Settimanale Completo
               </CardTitle>
-              <Button onClick={onEditPlan} variant="outline" className="rounded-full transition-all duration-300 hover:scale-105 hover:bg-emerald-50 hover:border-emerald-400 hover:text-emerald-600">
+              <Button onClick={onEditPlan} variant="outline" className="rounded-full transition-all duration-300 hover:scale-105 hover:bg-primary/10 hover:border-primary hover:text-primary">
                 <Edit className="h-4 w-4 mr-2" /> Modifica Piano
               </Button>
             </div>
@@ -210,24 +210,24 @@ export default function PatientDetailPage({
                         key={dayName} 
                         className={`${
                           isToday 
-                            ? 'ring-2 ring-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 animate-pulse-glow' 
-                            : 'bg-gray-50 dark:bg-gray-700/50'
+                            ? 'ring-2 ring-primary bg-primary/10 dark:bg-primary/20 animate-pulse-glow' 
+                            : 'bg-muted'
                         }`}
                       >
                         <CardHeader className="pb-3">
                           <div className="flex items-center justify-between">
                             <CardTitle className={`text-lg font-bold ${
                               isToday 
-                                ? 'text-emerald-700 dark:text-emerald-300' 
-                                : 'text-gray-800 dark:text-white'
+                                ? 'text-primary dark:text-primary' 
+                                : 'text-foreground'
                             }`}>
                               {dayName}
                               {isToday && <span className="ml-2 text-sm font-normal">(Oggi)</span>}
                             </CardTitle>
                             <Badge className={`${
                               isToday 
-                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-800 dark:text-emerald-200' 
-                                : 'bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-200'
+                                ? 'bg-primary/20 text-primary dark:bg-primary/30 dark:text-primary' 
+                                : 'bg-muted-foreground/20 text-muted-foreground'
                             }`}>
                               {totalDayCalories} kcal
                             </Badge>
@@ -288,24 +288,24 @@ export default function PatientDetailPage({
                         key={dayName} 
                         className={`${
                           isToday 
-                            ? 'ring-2 ring-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 animate-pulse-glow' 
-                            : 'bg-gray-50 dark:bg-gray-700/50'
+                            ? 'ring-2 ring-primary bg-primary/10 dark:bg-primary/20 animate-pulse-glow' 
+                            : 'bg-muted'
                         }`}
                       >
                         <CardHeader className="pb-3">
                           <div className="flex items-center justify-between">
                             <CardTitle className={`text-lg font-bold ${
                               isToday 
-                                ? 'text-emerald-700 dark:text-emerald-300' 
-                                : 'text-gray-800 dark:text-white'
+                                ? 'text-primary dark:text-primary' 
+                                : 'text-foreground'
                             }`}>
                               {dayName}
                               {isToday && <span className="ml-2 text-sm font-normal">(Oggi)</span>}
                             </CardTitle>
                             <Badge className={`${
                               isToday 
-                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-800 dark:text-emerald-200' 
-                                : 'bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-200'
+                                ? 'bg-primary/20 text-primary dark:bg-primary/30 dark:text-primary' 
+                                : 'bg-muted-foreground/20 text-muted-foreground'
                             }`}>
                               {totalDayCalories} kcal
                             </Badge>
@@ -520,7 +520,7 @@ export default function PatientDetailPage({
                     "Nessun piano alimentare disponibile."
                   }
                 </p>
-                <Button onClick={onEditPlan} className="bg-emerald-500 hover:bg-emerald-600">
+                <Button onClick={onEditPlan} className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-brand-accent transition-all duration-300 hover:scale-105">
                   <Plus className="h-4 w-4 mr-2" />
                   Crea Piano Alimentare
                 </Button>

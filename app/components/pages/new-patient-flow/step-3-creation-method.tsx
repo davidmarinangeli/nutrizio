@@ -4,7 +4,7 @@ import { useRef } from "react"
 import { Button } from "../../../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card"
 import { Badge } from "../../../../components/ui/badge"
-import { ChevronLeft, Moon, Sun, Brain, FileText, Layout, Upload, Loader2 } from "lucide-react"
+import { ChevronLeft, Moon, Sun, Brain, FileText, Layout, Upload, Loader2, Sparkles } from "lucide-react"
 
 interface Step3CreationMethodProps {
   selectedCreationMethod: "ai" | "pdf" | "template" | null
@@ -64,25 +64,25 @@ export default function Step3CreationMethod({
                     (selectedCreationMethod === "pdf" && uploadedFile)
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen w-full bg-background">
       <div className="w-full max-w-6xl mx-auto p-4 lg:p-8">
         <div className="flex items-center justify-between mb-6">
           <Button
             variant="ghost"
             size="icon"
             onClick={onBack}
-            className="rounded-full bg-emerald-400 text-white hover:bg-emerald-500 shadow-md"
+            className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-brand-primary"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Nuovo Paziente - Metodo di Creazione
           </h1>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="rounded-full bg-gray-100 dark:bg-gray-800"
+            className="rounded-full bg-muted hover:bg-muted/80"
           >
             {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
@@ -91,61 +91,57 @@ export default function Step3CreationMethod({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* AI Generation */}
           <Card 
-            className={`cursor-pointer transition-all duration-300 ${
-              selectedCreationMethod === "ai" 
-                ? "ring-2 ring-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 shadow-ai-gradient" 
-                : "hover:shadow-lg hover:shadow-ai-blue hover:scale-105 hover:bg-gradient-to-br hover:from-blue-50 hover:to-emerald-50 dark:hover:from-blue-900/20 dark:hover:to-emerald-900/20"
+            className={`w-full p-6 rounded-3xl border-2 cursor-pointer transition-all duration-300 ${
+              selectedCreationMethod === 'ai'
+                ? "ring-2 ring-primary bg-primary/10 dark:bg-primary/20 shadow-brand-primary" 
+                : "hover:shadow-lg hover:shadow-brand-secondary hover:scale-105 hover:bg-gradient-to-br hover:from-secondary/10 hover:to-primary/10"
             }`}
-            onClick={() => setSelectedCreationMethod("ai")}
+            onClick={() => setSelectedCreationMethod('ai')}
           >
-            <CardHeader className="text-center">
-              <div className={`mx-auto mb-4 p-4 rounded-full w-16 h-16 flex items-center justify-center transition-all duration-1200 ${
-                selectedCreationMethod === "ai" 
-                  ? "bg-gradient-to-br from-blue-100 to-emerald-100 dark:from-blue-900/40 dark:to-emerald-900/40 animate-ai-glow" 
-                  : "bg-emerald-100 dark:bg-emerald-900/40 hover:animate-ai-pulse"
-              }`}>
-                <Brain className={`h-8 w-8 transition-all duration-1200 ${
-                  selectedCreationMethod === "ai" 
-                    ? "text-blue-600 dark:text-blue-400" 
-                    : "text-emerald-600 dark:text-emerald-400"
-                }`} />
-              </div>
-              <CardTitle className="text-lg font-bold text-gray-800 dark:text-white">
-                Generazione AI
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                L'AI creerà un piano personalizzato basato sui dati del paziente
-              </p>
-              <Badge className="bg-emerald-500 text-white">
-                Raccomandato
-              </Badge>
-            </CardContent>
+            <div className={`mx-auto mb-4 p-4 rounded-full w-16 h-16 flex items-center justify-center ${
+              selectedCreationMethod === 'ai'
+                ? "bg-gradient-to-br from-secondary/20 to-primary/20 animate-brand-glow" 
+                : "bg-primary/10 hover:animate-pulse-glow"
+            }`}>
+              <Sparkles className={`h-8 w-8 ${
+                selectedCreationMethod === 'ai' 
+                  ? "text-primary animate-pulse" 
+                  : "text-primary"
+              }`} />
+            </div>
+            <CardTitle className="text-lg font-bold text-foreground">
+              Generazione AI
+            </CardTitle>
+            <p className="text-muted-foreground mb-4">
+              Utilizza l'intelligenza artificiale per creare automaticamente un piano personalizzato basato sui dati del paziente.
+            </p>
+            <Badge className="bg-accent text-accent-foreground">
+              Consigliato
+            </Badge>
           </Card>
 
           {/* Template Selection */}
           <Card 
             className={`cursor-pointer transition-all duration-300 ${
               selectedCreationMethod === "template" 
-                ? "ring-2 ring-blue-400 bg-blue-50 dark:bg-blue-900/20" 
+                ? "ring-2 ring-secondary bg-secondary/10 dark:bg-secondary/20" 
                 : "hover:shadow-lg"
             }`}
             onClick={() => setSelectedCreationMethod("template")}
           >
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 p-4 bg-blue-100 dark:bg-blue-900/40 rounded-full w-16 h-16 flex items-center justify-center">
-                <Layout className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              <div className="mx-auto mb-4 p-4 bg-secondary/10 dark:bg-secondary/20 rounded-full w-16 h-16 flex items-center justify-center">
+                <Layout className="h-8 w-8 text-secondary" />
               </div>
-              <CardTitle className="text-lg font-bold text-gray-800 dark:text-white">
+              <CardTitle className="text-lg font-bold text-foreground">
                 Da Template
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center">
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-muted-foreground mb-4">
                 Scegli da una selezione di template predefiniti
               </p>
-              <Badge className="bg-blue-500 text-white">
+              <Badge className="bg-secondary text-secondary-foreground">
                 Veloce
               </Badge>
             </CardContent>
@@ -155,24 +151,24 @@ export default function Step3CreationMethod({
           <Card 
             className={`cursor-pointer transition-all duration-300 ${
               selectedCreationMethod === "pdf" 
-                ? "ring-2 ring-purple-400 bg-purple-50 dark:bg-purple-900/20" 
+                ? "ring-2 ring-tertiary bg-tertiary/10 dark:bg-tertiary/20" 
                 : "hover:shadow-lg"
             }`}
             onClick={() => setSelectedCreationMethod("pdf")}
           >
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 p-4 bg-purple-100 dark:bg-purple-900/40 rounded-full w-16 h-16 flex items-center justify-center">
-                <FileText className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+              <div className="mx-auto mb-4 p-4 bg-tertiary/10 dark:bg-tertiary/20 rounded-full w-16 h-16 flex items-center justify-center">
+                <FileText className="h-8 w-8 text-tertiary" />
               </div>
-              <CardTitle className="text-lg font-bold text-gray-800 dark:text-white">
+              <CardTitle className="text-lg font-bold text-foreground">
                 Carica PDF
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center">
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-muted-foreground mb-4">
                 Carica un piano alimentare esistente in formato PDF
               </p>
-              <Badge className="bg-purple-500 text-white">
+              <Badge className="bg-tertiary text-tertiary-foreground">
                 Personalizzato
               </Badge>
             </CardContent>
@@ -181,9 +177,9 @@ export default function Step3CreationMethod({
 
         {/* Template Selection */}
         {selectedCreationMethod === "template" && (
-          <Card className="w-full bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg mb-8">
+          <Card className="w-full bg-card rounded-3xl border-0 shadow-lg mb-8">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-gray-800 dark:text-white">
+              <CardTitle className="text-xl font-bold text-foreground">
                 Seleziona Template
               </CardTitle>
             </CardHeader>
@@ -194,13 +190,13 @@ export default function Step3CreationMethod({
                     key={template.id}
                     className={`cursor-pointer transition-all duration-300 ${
                       selectedTemplate === template.id
-                        ? "ring-2 ring-emerald-400 bg-emerald-50 dark:bg-emerald-900/20"
+                        ? "ring-2 ring-primary bg-primary/10 dark:bg-primary/20"
                         : "hover:shadow-md"
                     }`}
                     onClick={() => setSelectedTemplate(template.id)}
                   >
                     <CardContent className="p-4">
-                      <h3 className="font-semibold text-gray-800 dark:text-white">
+                      <h3 className="font-semibold text-foreground">
                         {template.name}
                       </h3>
                     </CardContent>
@@ -213,16 +209,16 @@ export default function Step3CreationMethod({
 
         {/* PDF Upload */}
         {selectedCreationMethod === "pdf" && (
-          <Card className="w-full bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg mb-8">
+          <Card className="w-full bg-card rounded-3xl border-0 shadow-lg mb-8">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-gray-800 dark:text-white">
+              <CardTitle className="text-xl font-bold text-foreground">
                 Carica Piano Alimentare
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl p-8 text-center">
-                <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <div className="border-2 border-dashed border-border rounded-2xl p-8 text-center">
+                <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground mb-4">
                   Trascina qui il tuo file PDF o clicca per selezionarlo
                 </p>
                 <Button
@@ -240,8 +236,8 @@ export default function Step3CreationMethod({
                   className="hidden"
                 />
                 {uploadedFile && (
-                  <div className="mt-4 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
-                    <p className="text-emerald-700 dark:text-emerald-300 font-medium">
+                  <div className="mt-4 p-3 bg-primary/10 dark:bg-primary/20 rounded-lg">
+                    <p className="text-primary font-medium">
                       File caricato: {uploadedFile.name}
                     </p>
                   </div>
@@ -253,41 +249,41 @@ export default function Step3CreationMethod({
 
         {/* Patient Data Summary */}
         {patientData && (
-          <Card className="w-full bg-white dark:bg-gray-800 rounded-3xl border-0 shadow-lg mb-8">
+          <Card className="w-full bg-card rounded-3xl border-0 shadow-lg mb-8">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-gray-800 dark:text-white">
+              <CardTitle className="text-xl font-bold text-foreground">
                 Riepilogo Dati Paziente
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-4">
                 <div>
-                  <span className="font-semibold text-gray-800 dark:text-white">
+                  <span className="font-semibold text-foreground">
                     Nome:
                   </span>{" "}
                   {patientData.name}
                 </div>
                 <div>
-                  <span className="font-semibold text-gray-800 dark:text-white">
+                  <span className="font-semibold text-foreground">
                     Cognome:
                   </span>{" "}
                   {patientData.surname}
                 </div>
                 <div>
-                  <span className="font-semibold text-gray-800 dark:text-white">
+                  <span className="font-semibold text-foreground">
                     Calorie Target:
                   </span>{" "}
                   {patientData.targetCalories}
                 </div>
                 <div>
-                  <span className="font-semibold text-gray-800 dark:text-white">
+                  <span className="font-semibold text-foreground">
                     Obiettivo Principale:
                   </span>{" "}
                   {patientData.mainGoal}
                 </div>
                 {patientData.restrictions.length > 0 && (
                   <div>
-                    <span className="font-semibold text-gray-800 dark:text-white">
+                    <span className="font-semibold text-foreground">
                       Restrizioni:
                     </span>{" "}
                     {patientData.restrictions.join(", ")}
@@ -295,7 +291,7 @@ export default function Step3CreationMethod({
                 )}
                 {patientData.allergies.length > 0 && (
                   <div>
-                    <span className="font-semibold text-gray-800 dark:text-white">
+                    <span className="font-semibold text-foreground">
                       Allergie:
                     </span>{" "}
                     {patientData.allergies.join(", ")}
@@ -320,8 +316,8 @@ export default function Step3CreationMethod({
             disabled={!canProceed || isLoading}
             className={`rounded-2xl px-8 py-3 font-semibold transition-all duration-1200 ${
               isLoading 
-                ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white animate-ai-loading shadow-ai-gradient' 
-                : 'bg-emerald-500 hover:bg-emerald-600 text-white hover:shadow-glow hover:scale-105'
+                ? 'bg-gradient-to-r from-secondary to-primary text-primary-foreground animate-ai-loading shadow-brand-gradient' 
+                : 'bg-accent hover:bg-accent/90 text-accent-foreground hover:shadow-brand-accent hover:scale-105'
             }`}
           >
             {isLoading ? (
