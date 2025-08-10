@@ -1,6 +1,6 @@
-# 🥗 Nutrizio - Sistema di Gestione Pazienti per Dietisti
+# 🥗 Sprout - Sistema di Gestione Pazienti per Dietisti
 
-Nutrizio è un'applicazione web moderna per dietisti e nutrizionisti, che permette di gestire pazienti e generare piani alimentari personalizzati utilizzando l'intelligenza artificiale.
+Sprout è un'applicazione web moderna per dietisti e nutrizionisti, che permette di gestire pazienti e generare piani alimentari personalizzati utilizzando l'intelligenza artificiale.
 
 ## ✨ Caratteristiche Principali
 
@@ -31,8 +31,8 @@ Nutrizio è un'applicazione web moderna per dietisti e nutrizionisti, che permet
 
 1. **Clona il repository**
    ```bash
-   git clone https://github.com/tuo-username/nutrizio.git
-   cd nutrizio
+   git clone https://github.com/tuo-username/sprout.git
+   cd sprout
    ```
 
 2. **Installa le dipendenze**
@@ -74,7 +74,7 @@ Nutrizio è un'applicazione web moderna per dietisti e nutrizionisti, che permet
 ## 📁 Struttura del Progetto
 
 ```
-nutrizio/
+sprout/
 ├── app/                          # App Router di Next.js
 │   ├── components/              # Componenti React
 │   │   ├── pages/              # Pagine dell'applicazione

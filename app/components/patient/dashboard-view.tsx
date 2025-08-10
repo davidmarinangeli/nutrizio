@@ -231,7 +231,7 @@ export default function DashboardView({ meals, setMeals, onViewChange }: Dashboa
                           'completed' in item && item.completed
                             ? "bg-primary-50 dark:bg-primary-900/20 border-2 border-primary-200 dark:border-primary-700"
                             : ""
-                        } ${swipedItem === item.id ? "transform -translate-x-20" : ""}`}
+                        } ${swipedItem === item.id ? "transform -translate-x-40" : ""}`}
                         onTouchStart={(e) => handleTouchStart(e, item.id)}
                         onTouchMove={handleTouchMove}
                         onTouchEnd={() => handleTouchEnd(item.id)}

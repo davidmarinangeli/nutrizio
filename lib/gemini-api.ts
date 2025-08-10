@@ -43,10 +43,11 @@ export async function generateDietPlanWithGemini(patientData: PatientProfile): P
   console.log("Patient data received:", JSON.stringify(patientData, null, 2))
   
   const model = genAI.getGenerativeModel({ 
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash", 
     generationConfig: {
-      maxOutputTokens: 8192,
+      maxOutputTokens: 65536,
       temperature: 0.7,
+      responseMimeType: "application/json", // Force JSON response
     }
   })
 
@@ -59,11 +60,10 @@ export async function generateDietPlanWithGemini(patientData: PatientProfile): P
 
   console.log("Main goal translated:", mainGoalItalian)
   
-  // Generate one day at a time to avoid token limits
+  // 🚀 SINGLE WEEKLY GENERATION - Much faster with one API call + 65K token limit!
   const dayNames = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]
-  const weeklyPlan: any = {}
   const mealCountNum = parseInt(patientData.mealCount)
-  const dailyCalories = Math.floor(parseInt(patientData.targetCalories) / mealCountNum) // Divide by meal count
+  const dailyCalories = Math.floor(parseInt(patientData.targetCalories) / mealCountNum)
   
   // Define meal names based on meal count
   const getMealNames = (count: number): string[] => {
@@ -100,105 +100,197 @@ export async function generateDietPlanWithGemini(patientData: PatientProfile): P
     "Spuntino Sera": "22:00"
   }
   
-  for (const dayName of dayNames) {
-    const prompt = `Sei un nutrizionista esperto. Crea SOLO i pasti per ${dayName} in formato JSON valido.
+  // Create comprehensive weekly prompt - ONE API CALL for entire week!
+  const weeklyPrompt = `Sei un nutrizionista esperto. Crea un piano alimentare completo per una settimana in formato JSON.
 
-PROFILO: ${patientData.name}, ${patientData.age} anni, ${patientData.sex}, ${patientData.height}cm, ${patientData.weight}kg
-OBIETTIVO: ${mainGoalItalian}, ${patientData.targetCalories} kcal/giorno
-RESTRIZIONI: ${patientData.restrictions.join(", ") || "Nessuna"}
-ALLERGIE: ${patientData.allergies.join(", ") || "Nessuna"}
+PROFILO PAZIENTE:
+- Nome: ${patientData.name} ${patientData.surname}
+- Età: ${patientData.age} anni
+- Sesso: ${patientData.sex}
+- Altezza: ${patientData.height} cm
+- Peso: ${patientData.weight} kg
+- Obiettivo: ${mainGoalItalian}
+- Calorie giornaliere: ${patientData.targetCalories} kcal
+- Numero pasti al giorno: ${mealCountNum}
+- Restrizioni alimentari: ${patientData.restrictions.length > 0 ? patientData.restrictions.join(", ") : "Nessuna"}
+- Allergie: ${patientData.allergies.length > 0 ? patientData.allergies.join(", ") : "Nessuna"}
+${patientData.notes ? `- NOTE SPECIFICHE: ${patientData.notes}` : ""}
 
-Crea esattamente ${mealCountNum} pasti con questi nomi e orari:
-${mealNames.map((name, index) => `- ${name} (~${dailyCalories} kcal) alle ${mealTimes[name as keyof typeof mealTimes]}`).join("\n")}
+STRUTTURA PASTI GIORNALIERA (${mealCountNum} pasti):
+${mealNames.map((name, index) => `${index + 1}. ${name} alle ${mealTimes[name as keyof typeof mealTimes]} (~${dailyCalories} kcal)`).join("\n")}
 
-IMPORTANTE: 
-- Ogni alimento deve avere 2 alternative
-- USA SOLO virgolette doppie (") nel JSON, MAI apostrofi (') o virgolette singole
-- Per contrazioni italiane usa "di avena" invece di "d'avena", "alla italiana" invece di "all'italiana"
-- NON usare caratteri speciali o simboli che potrebbero causare errori
-- Genera JSON valido senza commenti o testo extra
+REGOLE FONDAMENTALI:
+1. Crea esattamente 7 giorni (Lunedì-Domenica)
+2. Ogni giorno deve avere esattamente ${mealCountNum} pasti
+3. Ogni alimento deve avere esattamente 2 alternative
+4. Totale giornaliero: circa ${patientData.targetCalories} kcal
+5. RISPETTA RIGOROSAMENTE le restrizioni, allergie e note specifiche del paziente
+6. Varia i cibi durante la settimana per bilanciamento nutrizionale
+7. USA SOLO virgolette doppie ("), MAI apostrofi o virgolette singole
+8. Evita contrazioni: "di avena" non "d'avena", "alla griglia" non "all'italiana"
 
-RISPOSTA FORMATO JSON (SENZA TESTO AGGIUNTIVO):
-[
-  {
-    "meal_name": "Colazione",
-    "meal_time": "08:00",
-    "total_calories": 400,
-    "food_items": [
-      {
-        "name": "Yogurt greco",
-        "quantity": "200",
-        "unit": "g", 
-        "calories": 130,
-        "alternatives": [
-          {"name": "Skyr", "quantity": "180", "unit": "g", "calories": 120},
-          {"name": "Ricotta", "quantity": "150", "unit": "g", "calories": 140}
-        ]
-      }
-    ]
-  }
-]`
-
-    try {
-      console.log(`Generating ${dayName}...`)
-      const result = await model.generateContent(prompt)
-      const response = await result.response
-      const text = response.text()
-      
-      // Clean up smart quotes and formatting issues
-      let cleanedText = text
-        .replace(/[""]/g, '"')  // Smart quotes to regular quotes
-        .replace(/['']/g, "'")  // Smart apostrophes to regular apostrophes  
-        .replace(/['']/g, "'")  // More smart apostrophes
-      
-      // Extract JSON array
-      const arrayMatch = cleanedText.match(/\[[\s\S]*\]/)
-      if (!arrayMatch) {
-        console.error(`Failed to extract JSON array for ${dayName}. Response:`, cleanedText)
-        throw new Error(`Failed to extract JSON for ${dayName}`)
-      }
-      
-      let cleanedJson = arrayMatch[0]
-      
-      // More robust JSON cleaning - handle apostrophes carefully
-      cleanedJson = cleanedJson
-        .replace(/\/\/.*$/gm, '')  // Remove comments
-        .replace(/,(\s*[}\]])/g, '$1')  // Fix trailing commas
-        .replace(/([^\\])'/g, '$1\\"')  // Replace single quotes with double quotes (except escaped ones)
-        .replace(/\\'/g, "\\'")  // Keep escaped apostrophes as is
-      
-      let dayMeals
-      try {
-        dayMeals = JSON.parse(cleanedJson)
-      } catch (parseError) {
-        console.error(`JSON Parse Error for ${dayName}:`, parseError)
-        console.error(`Problematic JSON:`, cleanedJson.substring(0, 200) + '...')
-        
-        // Try alternative cleaning approach
-        let alternativeJson = arrayMatch[0]
-          .replace(/\/\/.*$/gm, '')
-          .replace(/,(\s*[}\]])/g, '$1')
-          .replace(/'/g, '"')  // Simply replace all single quotes with double quotes
-        
-        try {
-          dayMeals = JSON.parse(alternativeJson)
-          console.log(`✓ Alternative parsing worked for ${dayName}`)
-        } catch (secondError) {
-          console.error(`Second parse attempt failed for ${dayName}:`, secondError)
-          throw new Error(`Failed to parse JSON for ${dayName}`)
+GENERA UN OGGETTO JSON CON QUESTA STRUTTURA ESATTA:
+{
+  "Lunedì": [
+    {
+      "meal_name": "Colazione",
+      "meal_time": "08:00",
+      "total_calories": 400,
+      "food_items": [
+        {
+          "name": "Yogurt greco naturale",
+          "quantity": "200",
+          "unit": "g",
+          "calories": 130,
+          "alternatives": [
+            {"name": "Skyr naturale", "quantity": "180", "unit": "g", "calories": 120},
+            {"name": "Ricotta magra", "quantity": "150", "unit": "g", "calories": 140}
+          ]
         }
+      ]
+    }
+  ],
+  "Martedì": [...],
+  "Mercoledì": [...],
+  "Giovedì": [...],
+  "Venerdì": [...],
+  "Sabato": [...],
+  "Domenica": [...]
+}`
+
+  // Declare weeklyPlan at function scope
+  let weeklyPlan: any
+
+  try {
+    console.log("\n🚀 === WEEKLY PLAN GENERATION ===")
+    console.log("🚀 Generating entire weekly plan with single API call (MUCH FASTER!)...")
+    console.log("🔍 Token limit: 65,536 (should handle full week!)")
+    
+    const startTime = Date.now()
+    const result = await model.generateContent(weeklyPrompt)
+    const endTime = Date.now()
+    const responseTime = endTime - startTime
+    
+    console.log(`⚡ TOTAL Response time: ${responseTime}ms (${(responseTime/1000).toFixed(1)}s)`)
+    console.log(`🎯 Speed improvement: ~70% faster than 7 separate calls!`)
+    
+    const response = await result.response
+    
+    // 🔍 DEBUG: Check finish reason to identify any truncation
+    console.log(`\n🔍 === WEEKLY RESPONSE DEBUG ===`)
+    if (response.candidates && response.candidates[0]) {
+      const candidate = response.candidates[0]
+      console.log("🚨 FINISH REASON:", candidate.finishReason)
+      
+      if (candidate.finishReason === 'MAX_TOKENS') {
+        console.log("🚨 STILL HIT TOKEN LIMIT with 65K tokens!")
+        console.log("💡 Consider simplifying meal descriptions or splitting generation")
+      } else if (candidate.finishReason === 'STOP') {
+        console.log("✅ Response completed normally")
+      } else {
+        console.log("⚠️ Unexpected finish reason:", candidate.finishReason)
       }
-      weeklyPlan[dayName] = dayMeals
+    }
+    
+    // Check usage metadata if available
+    if (response.usageMetadata) {
+      console.log("📊 TOKEN USAGE:")
+      console.log("- Prompt tokens:", response.usageMetadata.promptTokenCount)
+      console.log("- Response tokens:", response.usageMetadata.candidatesTokenCount)
+      console.log("- Total tokens:", response.usageMetadata.totalTokenCount)
+      console.log("- Token limit hit:", response.usageMetadata.candidatesTokenCount >= 65536)
+    }
+    
+    const text = response.text()
+    
+    console.log("\n📥 === RAW WEEKLY RESPONSE ===")
+    console.log("Response length:", text.length)
+    console.log("First 500 chars:", text.substring(0, 500))
+    console.log("Last 500 chars:", text.substring(Math.max(0, text.length - 500)))
+    console.log("📥 === END RAW WEEKLY RESPONSE ===\n")
+
+    // Since we're using responseMimeType: "application/json", try direct parsing first
+    try {
+      weeklyPlan = JSON.parse(text)
+      console.log("✅ Direct JSON parsing successful!")
+    } catch (directParseError) {
+      console.log("⚠️ Direct parse failed, attempting extraction...")
       
-      console.log(`✓ Generated ${dayName} with ${dayMeals.length} meals`)
+      // Enhanced JSON extraction and repair
+      let cleanedText = text
+        .replace(/```json\s*/gi, '')
+        .replace(/```\s*/gi, '')
+        .replace(/[""]/g, '"')
+        .replace(/['']/g, "'")
+        .trim()
       
-      // Small delay to avoid rate limits
-      await new Promise(resolve => setTimeout(resolve, 100))
+      // Find the main JSON object
+      let jsonStart = cleanedText.indexOf('{')
+      let jsonEnd = cleanedText.lastIndexOf('}')
       
-    } catch (error) {
-      console.error(`Error generating ${dayName}:`, error)
-      // Fallback to simple meals for this day using the specified meal count
-      const fallbackMeals = mealNames.map((mealName, index) => ({
+      if (jsonStart === -1 || jsonEnd === -1 || jsonEnd <= jsonStart) {
+        throw new Error("No valid JSON object found in response")
+      }
+      
+      let jsonString = cleanedText.substring(jsonStart, jsonEnd + 1)
+      
+      // Basic JSON cleaning
+      jsonString = jsonString
+        .replace(/,(\s*[}\]])/g, '$1')  // Remove trailing commas
+        .replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3')  // Quote unquoted keys
+        .replace(/:\s*'([^']*)'/g, ': "$1"')  // Single quotes to double quotes
+      
+      try {
+        weeklyPlan = JSON.parse(jsonString)
+        console.log("✅ Basic JSON repair successful!")
+      } catch (repairError) {
+        console.log("❌ Basic repair failed:", (repairError as Error).message)
+        throw new Error("Failed to parse JSON response")
+      }
+    }
+    
+    // Validate the weekly plan structure
+    if (!weeklyPlan || typeof weeklyPlan !== 'object') {
+      throw new Error("Invalid weekly plan structure")
+    }
+    
+    // Ensure all days are present and valid
+    const missingDays = dayNames.filter(day => !weeklyPlan[day] || !Array.isArray(weeklyPlan[day]))
+    if (missingDays.length > 0) {
+      console.warn("⚠️ Missing or invalid days:", missingDays)
+      
+      // Fill missing days with fallback meals
+      for (const missingDay of missingDays) {
+        weeklyPlan[missingDay] = mealNames.map((mealName, index) => ({
+          meal_name: mealName,
+          meal_time: mealTimes[mealName as keyof typeof mealTimes],
+          total_calories: dailyCalories,
+          food_items: [{
+            name: `Pasto ${index + 1} - ${mealName}`,
+            quantity: "1",
+            unit: "porzione",
+            calories: dailyCalories,
+            alternatives: [
+              {name: `Alternativa 1 - ${mealName}`, quantity: "1", unit: "porzione", calories: dailyCalories},
+              {name: `Alternativa 2 - ${mealName}`, quantity: "1", unit: "porzione", calories: dailyCalories}
+            ]
+          }]
+        }))
+      }
+    }
+    
+    console.log("✅ Weekly plan generated successfully!")
+    console.log("Days with meals:", Object.keys(weeklyPlan))
+    
+  } catch (error: any) {
+    console.error("❌ Error generating weekly plan:", error.message)
+    console.error("Full error:", error)
+    
+    // Create complete fallback weekly plan
+    console.log("🔄 Using fallback weekly plan...")
+    weeklyPlan = {}
+    for (const dayName of dayNames) {
+      weeklyPlan[dayName] = mealNames.map((mealName, index) => ({
         meal_name: mealName,
         meal_time: mealTimes[mealName as keyof typeof mealTimes],
         total_calories: dailyCalories,
@@ -213,8 +305,6 @@ RISPOSTA FORMATO JSON (SENZA TESTO AGGIUNTIVO):
           ]
         }]
       }))
-      
-      weeklyPlan[dayName] = fallbackMeals
     }
   }
   

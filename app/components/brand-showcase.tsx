@@ -34,8 +34,8 @@ export default function BrandShowcase({ onBack }: BrandShowcaseProps) {
         </div>
         
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-foreground">
-            Nutrizio Brand Identity 🌱
+                    <h1 className="text-4xl font-bold text-primary mb-4 animate-fade-in-up">
+            Sprout Brand Identity 🌱
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Experience our nature-inspired color palette designed for health and nutrition

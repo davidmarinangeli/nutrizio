@@ -1,11 +1,11 @@
-# Nutrizio Brand Colors Guide 🌱
+# Sprout Brand Colors Guide 🌱
 
 ## Color Philosophy
 Our brand identity is inspired by nature, health, and fresh nutrition. The palette uses vibrant greens that evoke freshness, growth, and wellness, complemented by warm orange accents that represent energy and vitality.
 
 ## ✅ **IMPLEMENTED & READY TO USE**
 
-The brand colors have been fully integrated into your Nutrizio app! All components now use the new nature-inspired palette.
+The brand colors have been fully integrated into your Sprout app! All components now use the new nature-inspired palette.
 
 ## Integration Status ✅
 

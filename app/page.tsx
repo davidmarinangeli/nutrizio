@@ -46,8 +46,8 @@ export default function AppSelector() {
         </div>
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-brand-gradient bg-clip-text text-transparent mb-2">
-            Nutrizio
+          <h1 className="text-3xl font-bold text-primary">
+            Sprout 🌱
           </h1>
           <p className="text-muted-foreground">Scegli la tua modalità di accesso</p>
         </div>
