@@ -184,7 +184,7 @@ export default function PatientDetailPage({
 
         {/* Weekly Plan View */}
         <Card className="w-full bg-card rounded-3xl border-0 shadow-lg animate-fade-in-up">
-          <CardHeader className="animate-fade-in-down">
+          <CardHeader className="animate-fade-in-down pb-8">
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-bold text-foreground">
                 Piano Settimanale Completo
@@ -194,7 +194,70 @@ export default function PatientDetailPage({
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
+          {/* Patient Summary Information */}
+            <div className="mr-6 ml-6 p-4 bg-muted rounded-2xl">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Target Calories */}
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                    <Calendar className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Target Calorico</p>
+                    <p className="font-semibold text-foreground">{patient.target_calories} kcal/giorno</p>
+                  </div>
+                </div>
+                
+                {/* Main Goal */}
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center">
+                    <Award className="h-5 w-5 text-secondary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Obiettivo</p>
+                    <p className="font-semibold text-foreground">
+                      {patient.main_goal === 'weight-loss' ? 'Perdita di peso' :
+                       patient.main_goal === 'muscle-gain' ? 'Aumento massa muscolare' :
+                       patient.main_goal === 'maintenance' ? 'Mantenimento' :
+                       patient.main_goal}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Allergies */}
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-destructive/10 rounded-full flex items-center justify-center">
+                    <Badge className="h-5 w-5 text-destructive" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Allergie</p>
+                    <p className="font-semibold text-foreground">
+                      {patient.allergies && patient.allergies.length > 0 ? 
+                        patient.allergies.join(', ') : 
+                        'Nessuna'
+                      }
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Dietary Restrictions */}
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center">
+                    <Star className="h-5 w-5 text-accent" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Restrizioni</p>
+                    <p className="font-semibold text-foreground">
+                      {patient.restrictions && patient.restrictions.length > 0 ? 
+                        patient.restrictions.join(', ') : 
+                        'Nessuna'
+                      }
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <CardContent className="px-6 pb-6 pt-12">
             {weeklyMealPlan && Object.keys(weeklyMealPlan).length > 0 ? (
               <div className="space-y-6">
                 {/* Row 1: Monday and Tuesday */}
