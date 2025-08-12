@@ -358,3 +358,360 @@ function getDefaultMealTime(mealName: string): string {
 function calculateMealCalories(foodItems: FoodItem[]): number {
   return foodItems.reduce((total, food) => total + (food.calories || 0), 0)
 }
+
+interface FoodAlternative {
+  name: string
+  quantity: string
+  unit: string
+  calories: number
+}
+
+export async function generateFoodAlternativesWithGemini(
+  foodName: string,
+  foodQuantity: string,
+  foodUnit: string,
+  foodCalories: number,
+  existingAlternatives: FoodAlternative[],
+  patientData: {
+    age: string
+    sex: string
+    height: string
+    weight: string
+    targetCalories: string
+    mainGoal: string
+    restrictions: string[]
+    allergies: string[]
+    notes?: string
+  }
+): Promise<FoodAlternative[]> {
+  console.log("=== GEMINI ALTERNATIVES API CALL ===")
+  console.log("Food to replace:", { foodName, foodQuantity, foodUnit, foodCalories })
+  console.log("Existing alternatives:", existingAlternatives)
+  console.log("Patient context:", patientData)
+  
+  // SEPARATE MODEL FOR ALTERNATIVES - Same config as weekly plan (no more token issues!)
+  const model = genAI.getGenerativeModel({ 
+    model: "gemini-2.5-flash", 
+    generationConfig: {
+      maxOutputTokens: 65536,  // Same as weekly plan - full token allocation
+      temperature: 0.7,
+      // No responseMimeType to avoid JSON constraint overhead
+    }
+  })
+
+  const mainGoalItalian = {
+    "weight-loss": "perdita di peso",
+    "muscle-gain": "aumento massa muscolare", 
+    "maintenance": "mantenimento del peso",
+    "health": "salute generale"
+  }[patientData.mainGoal] || patientData.mainGoal
+
+  // Determine food category for fallback logic
+  const getFoodCategory = (name: string): string => {
+    const lowerName = name.toLowerCase()
+    if (lowerName.includes('pollo') || lowerName.includes('carne') || lowerName.includes('pesce') || 
+        lowerName.includes('uova') || lowerName.includes('tonno') || lowerName.includes('salmone') ||
+        lowerName.includes('tacchino') || lowerName.includes('bresaola') || lowerName.includes('prosciutto')) {
+      return "proteine animali"
+    }
+    if (lowerName.includes('riso') || lowerName.includes('pasta') || lowerName.includes('pane') || 
+        lowerName.includes('cereali') || lowerName.includes('avena') || lowerName.includes('quinoa') ||
+        lowerName.includes('orzo') || lowerName.includes('farro')) {
+      return "carboidrati/cereali"
+    }
+    if (lowerName.includes('latte') || lowerName.includes('yogurt') || lowerName.includes('formaggio') || 
+        lowerName.includes('ricotta') || lowerName.includes('mozzarella') || lowerName.includes('grana')) {
+      return "latticini"
+    }
+    if (lowerName.includes('olio') || lowerName.includes('burro') || lowerName.includes('noci') || 
+        lowerName.includes('mandorle') || lowerName.includes('semi') || lowerName.includes('avocado')) {
+      return "grassi/lipidi"
+    }
+    if (lowerName.includes('verdura') || lowerName.includes('insalata') || lowerName.includes('pomodori') || 
+        lowerName.includes('carote') || lowerName.includes('spinaci') || lowerName.includes('broccoli')) {
+      return "verdure"
+    }
+    if (lowerName.includes('frutta') || lowerName.includes('mela') || lowerName.includes('banana') || 
+        lowerName.includes('arancia') || lowerName.includes('pera') || lowerName.includes('kiwi')) {
+      return "frutta"
+    }
+    if (lowerName.includes('legumi') || lowerName.includes('fagioli') || lowerName.includes('lenticchie') || 
+        lowerName.includes('ceci') || lowerName.includes('piselli')) {
+      return "legumi"
+    }
+    return "altro"
+  }
+
+  const foodCategory = getFoodCategory(foodName)
+
+  // Create list of foods to avoid (main food + existing alternatives)
+  const foodsToAvoid = [
+    foodName,
+    ...existingAlternatives.map(alt => alt.name)
+  ]
+
+  // INTELLIGENT prompt with patient context but optimized for token efficiency
+  const prompt = `Suggerisci 2 alternative per ${foodName} (${foodCategory}):
+
+PAZIENTE: ${patientData.age}anni, ${mainGoalItalian}, ${patientData.targetCalories}kcal/giorno
+ALLERGIE: ${patientData.allergies.length > 0 ? patientData.allergies.join(', ') : 'Nessuna'}
+RESTRIZIONI: ${patientData.restrictions.length > 0 ? patientData.restrictions.join(', ') : 'Nessuna'}
+${patientData.notes ? `NOTE: ${patientData.notes}` : ''}
+
+EVITA: ${foodsToAvoid.join(', ')}
+
+REGOLE:
+- Stessa categoria nutrizionale (${foodCategory})
+- Calorie simili (${foodCalories}±20%)
+- Rispetta allergie/restrizioni
+- Facilmente reperibili in Italia
+
+JSON: [{"name":"alt1","quantity":"${foodQuantity}","unit":"${foodUnit}","calories":numero},{"name":"alt2","quantity":"${foodQuantity}","unit":"${foodUnit}","calories":numero}]`
+
+  try {
+    console.log("🚀 Generating AI alternatives...")
+    console.log("📝 Prompt length:", prompt.length, "characters")
+    console.log("📝 Prompt preview:", prompt.substring(0, 200) + "...")
+    const startTime = Date.now()
+    
+    let result = await model.generateContent(prompt)
+    let response = result.response
+    let text = response.text()
+    
+    const endTime = Date.now()
+    console.log(`⚡ AI Alternatives generated in: ${endTime - startTime}ms`)
+    
+    console.log("📥 Raw AI response:", text)
+    console.log("📥 Response length:", text.length)
+    console.log("📥 Response candidates:", result.response.candidates?.length || 0)
+    
+    // Log finish reason for debugging
+    const finishReason = result.response.candidates?.[0]?.finishReason
+    console.log("🏁 Finish reason:", finishReason)
+    
+    // Check for token limit issues - Smart 2-level fallback with reduced context
+    if (finishReason === "MAX_TOKENS" || (!text || text.trim().length < 10)) {
+      console.warn("⚠️ Hit MAX_TOKENS limit or empty response, trying LEVEL 1 fallback...")
+      
+      // LEVEL 1: Keep essential context but reduce format
+      const simplePrompt = `Alternative ${foodCategory} per ${foodName}. Evita: ${foodsToAvoid.join(', ')}. Allergie: ${patientData.allergies.join(', ') || 'Nessuna'}. JSON: [{"name":"alt1","quantity":"${foodQuantity}","unit":"${foodUnit}","calories":${foodCalories}},{"name":"alt2","quantity":"${foodQuantity}","unit":"${foodUnit}","calories":${Math.round(foodCalories * 1.05)}}]`
+      
+      console.log("🔄 Trying LEVEL 1 with reduced context:", simplePrompt.substring(0, 150) + "...")
+      
+      try {
+        const simpleResult = await model.generateContent(simplePrompt)
+        const simpleResponse = simpleResult.response
+        const simpleText = simpleResponse.text()
+        
+        console.log("📥 LEVEL 1 response:", simpleText)
+        console.log("📥 LEVEL 1 response length:", simpleText.length)
+        
+        if (simpleText && simpleText.trim().length > 0) {
+          // Use the simple response
+          text = simpleText
+          result = simpleResult
+          response = simpleResponse
+          console.log("✅ Using LEVEL 1 response")
+        } else {
+          throw new Error("LEVEL 1 fallback failed")
+        }
+      } catch (level1Error) {
+        console.error("❌ LEVEL 1 fallback failed:", level1Error)
+        console.warn("⚠️ Going to LEVEL 2 fallback (intelligent fallbacks)...")
+        throw new Error("LEVEL 2 fallback needed")
+      }
+    }
+    
+    // Check if response is still empty
+    if (!text || text.trim().length < 10) {
+      console.error("❌ Empty or very short response from Gemini")
+      console.log("📋 Full result object:", JSON.stringify({
+        candidates: result.response.candidates,
+        promptFeedback: result.response.promptFeedback,
+        usageMetadata: result.response.usageMetadata
+      }, null, 2))
+      throw new Error("Empty response from AI service")
+    }
+    
+    // Parse the JSON response
+    let alternatives: FoodAlternative[]
+    try {
+      // First, try direct parsing
+      alternatives = JSON.parse(text.trim())
+      console.log("✅ Direct JSON parsing successful!")
+    } catch (parseError) {
+      console.log("⚠️ Direct parse failed, attempting extraction...")
+      console.log("Parse error:", (parseError as Error).message)
+      
+      // Clean and extract JSON - handle markdown code blocks
+      let cleanedText = text
+        .replace(/```json\s*/gi, '')  // Remove ```json
+        .replace(/```javascript\s*/gi, '')  // Remove ```javascript  
+        .replace(/```\s*/gi, '')      // Remove closing ```
+        .replace(/[""]/g, '"')        // Replace smart quotes
+        .replace(/'/g, '"')           // Replace single quotes with double quotes
+        .replace(/[\r\n\t]/g, ' ')    // Replace newlines and tabs with spaces
+        .replace(/\s+/g, ' ')         // Collapse multiple spaces
+        .trim()
+      
+      console.log("🧹 Cleaned text:", cleanedText)
+      
+      // Try to find JSON array with more flexible pattern
+      let jsonMatch = cleanedText.match(/\[[\s\S]*?\]/);
+      if (jsonMatch) {
+        let jsonString = jsonMatch[0]
+        console.log("🎯 Extracted JSON string:", jsonString)
+        
+        try {
+          alternatives = JSON.parse(jsonString)
+          console.log("✅ JSON extraction successful!")
+        } catch (extractError) {
+          console.error("❌ JSON extraction failed:", (extractError as Error).message)
+          
+          // Try one more time with even more aggressive cleaning
+          try {
+            let superCleanedText = jsonString
+              .replace(/([{,]\s*)(\w+):/g, '$1"$2":')  // Quote unquoted keys
+              .replace(/:\s*([^",\[\]{}\s][^",\[\]{}]*?)(\s*[,\]}])/g, ':"$1"$2')  // Quote unquoted values
+            
+            console.log("🔧 Super cleaned text:", superCleanedText)
+            alternatives = JSON.parse(superCleanedText)
+            console.log("✅ Super aggressive parsing successful!")
+          } catch (finalError) {
+            console.error("❌ Final parsing failed:", (finalError as Error).message)
+            throw new Error("Failed to parse extracted JSON after all attempts")
+          }
+        }
+      } else {
+        console.error("❌ No JSON array pattern found in response")
+        throw new Error("No valid JSON array found in response")
+      }
+    }
+    
+    // Validate alternatives
+    if (!Array.isArray(alternatives)) {
+      console.error("❌ Response is not an array:", typeof alternatives)
+      throw new Error("Invalid alternatives format - not an array")
+    }
+    
+    if (alternatives.length === 0) {
+      console.error("❌ Empty alternatives array")
+      throw new Error("Empty alternatives array")
+    }
+    
+    // Take up to 2 alternatives
+    alternatives = alternatives.slice(0, 2)
+    
+    // Validate each alternative
+    for (const [index, alt] of alternatives.entries()) {
+      if (!alt.name || !alt.quantity || !alt.unit || typeof alt.calories !== 'number') {
+        console.error(`❌ Invalid alternative structure at index ${index}:`, alt)
+        
+        // Try to fix missing/invalid data
+        if (!alt.name) alt.name = `Alternativa ${index + 1} per ${foodName}`
+        if (!alt.quantity) alt.quantity = foodQuantity
+        if (!alt.unit) alt.unit = foodUnit
+        if (typeof alt.calories !== 'number') alt.calories = Math.round(foodCalories * (0.95 + Math.random() * 0.1))
+      }
+    }
+    
+    // Check for duplicates with existing foods
+    const duplicates = alternatives.filter(alt => 
+      foodsToAvoid.some(existing => existing.toLowerCase().includes(alt.name.toLowerCase()) || alt.name.toLowerCase().includes(existing.toLowerCase()))
+    )
+    
+    if (duplicates.length > 0) {
+      console.warn("⚠️ AI suggested duplicates:", duplicates.map(d => d.name))
+      // Filter out duplicates if possible
+      alternatives = alternatives.filter(alt => 
+        !foodsToAvoid.some(existing => existing.toLowerCase().includes(alt.name.toLowerCase()) || alt.name.toLowerCase().includes(existing.toLowerCase()))
+      )
+      
+      // If we filtered out too many, keep originals with warning
+      if (alternatives.length === 0) {
+        console.warn("⚠️ All alternatives were duplicates, keeping originals")
+        alternatives = duplicates
+      }
+    }
+    
+    // Ensure we have at least 1 alternative
+    while (alternatives.length < 2) {
+      alternatives.push({
+        name: `Alternativa ${alternatives.length + 1} per ${foodName}`,
+        quantity: foodQuantity,
+        unit: foodUnit,
+        calories: Math.round(foodCalories * (0.95 + Math.random() * 0.1))
+      })
+    }
+    
+    console.log("✅ AI alternatives generated successfully:", alternatives)
+    return alternatives
+    
+  } catch (error: any) {
+    console.error("❌ Error generating AI alternatives:", error.message)
+    console.error("❌ Full error:", error)
+    
+    // LEVEL 2: Enhanced fallback alternatives (only 2 levels total)
+    console.log("🔄 Using LEVEL 2 enhanced fallback alternatives...")
+    const fallbackAlternatives: FoodAlternative[] = []
+    
+    if (foodCategory === "proteine animali") {
+      const proteinOptions = [
+        { name: "Petto di tacchino", calories: Math.round(foodCalories * 0.95) },
+        { name: "Filetto di merluzzo", calories: Math.round(foodCalories * 1.05) },
+        { name: "Bresaola", calories: Math.round(foodCalories * 0.85) },
+        { name: "Salmone", calories: Math.round(foodCalories * 1.15) }
+      ]
+      
+      const availableOptions = proteinOptions.filter(option => 
+        !foodsToAvoid.some(existing => existing.toLowerCase().includes(option.name.toLowerCase()))
+      )
+      
+      fallbackAlternatives.push(...availableOptions.slice(0, 2).map(option => ({
+        name: option.name,
+        quantity: foodQuantity,
+        unit: foodUnit,
+        calories: option.calories
+      })))
+      
+    } else if (foodCategory === "carboidrati/cereali") {
+      const carbOptions = [
+        { name: "Quinoa", calories: Math.round(foodCalories * 0.9) },
+        { name: "Farro", calories: Math.round(foodCalories * 1.1) },
+        { name: "Riso integrale", calories: Math.round(foodCalories * 0.95) },
+        { name: "Orzo", calories: Math.round(foodCalories * 1.05) }
+      ]
+      
+      const availableOptions = carbOptions.filter(option => 
+        !foodsToAvoid.some(existing => existing.toLowerCase().includes(option.name.toLowerCase()))
+      )
+      
+      fallbackAlternatives.push(...availableOptions.slice(0, 2).map(option => ({
+        name: option.name,
+        quantity: foodQuantity,
+        unit: foodUnit,
+        calories: option.calories
+      })))
+      
+    } else {
+      // Generic fallbacks
+      fallbackAlternatives.push(
+        { name: `${foodName} biologico`, quantity: foodQuantity, unit: foodUnit, calories: Math.round(foodCalories * 0.98) },
+        { name: `${foodName} integrale`, quantity: foodQuantity, unit: foodUnit, calories: Math.round(foodCalories * 1.02) }
+      )
+    }
+    
+    // Ensure exactly 2 alternatives
+    while (fallbackAlternatives.length < 2) {
+      fallbackAlternatives.push({
+        name: `Alternativa ${fallbackAlternatives.length + 1}`,
+        quantity: foodQuantity,
+        unit: foodUnit,
+        calories: Math.round(foodCalories * (0.95 + Math.random() * 0.1))
+      })
+    }
+    
+    console.log("🔄 LEVEL 2 fallback alternatives:", fallbackAlternatives.slice(0, 2))
+    return fallbackAlternatives.slice(0, 2)
+  }
+}

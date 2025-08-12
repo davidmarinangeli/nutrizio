@@ -6,9 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../../../components
 import { Badge } from "../../../../components/ui/badge"
 import { Switch } from "../../../../components/ui/switch"
 import { Label } from "../../../../components/ui/label"
-import { ChevronLeft, Moon, Sun, Loader2, Check, Plus, Edit, Trash2, X, Wand2 } from "lucide-react"
 import { Input } from "../../../../components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select"
+import { ChevronLeft, Moon, Sun, Plus, Edit, Trash2, X, Wand2, Loader2, Check } from "lucide-react"
+import { generateAlternatives, type GenerateAlternativesRequest } from "../../../actions/generate-alternatives"
 
 interface Step4PreviewFixedProps {
   generatedWeeklyPlan: any
@@ -73,6 +74,12 @@ export default function Step4PreviewFixed({
   const [newAlternativeName, setNewAlternativeName] = useState("")
   const [newAlternativeQuantity, setNewAlternativeQuantity] = useState("")
   const [newAlternativeUnit, setNewAlternativeUnit] = useState("g")
+  
+  // Main food editing states
+  const [editingMainFood, setEditingMainFood] = useState(false)
+  const [editedFoodName, setEditedFoodName] = useState("")
+  const [editedFoodQuantity, setEditedFoodQuantity] = useState("")
+  const [editedFoodUnit, setEditedFoodUnit] = useState("g")
   
   // AI suggestions states
   const [aiSuggestions, setAiSuggestions] = useState<Array<{
@@ -170,55 +177,134 @@ export default function Step4PreviewFixed({
     })
   }
 
+  const updateMainFood = () => {
+    if (!selectedFoodForAlternatives || !editedFoodName || !editedFoodQuantity) return
+
+    const { mealId, foodId } = selectedFoodForAlternatives
+
+    setWeeklyMealPlan((prev: any) => {
+      const newPlan = { ...prev }
+      const dayName = dayNamesFull[selectedDayIndex]
+      
+      // Safety check: ensure the day exists and has meals
+      if (!newPlan[dayName] || !Array.isArray(newPlan[dayName])) {
+        console.warn(`Day ${dayName} not found or not an array in meal plan`)
+        return prev
+      }
+      
+      newPlan[dayName] = newPlan[dayName].map((meal: any) =>
+        meal.id === mealId
+          ? {
+              ...meal,
+              food_items: (meal.food_items || []).map((food: any) =>
+                food.id === foodId
+                  ? {
+                      ...food,
+                      name: editedFoodName,
+                      quantity: editedFoodQuantity,
+                      unit: editedFoodUnit,
+                    }
+                  : food,
+              ),
+            }
+          : meal,
+      )
+      return newPlan
+    })
+
+    // Reset editing state
+    setEditingMainFood(false)
+    setEditedFoodName("")
+    setEditedFoodQuantity("")
+    setEditedFoodUnit("g")
+  }
+
   const generateAIAlternatives = async () => {
-    if (!selectedFoodForAlternatives) return
+    if (!selectedFoodForAlternatives || !patientData) return
     
     setIsGeneratingAI(true)
     
     try {
-      // Simulate AI generation - in a real app this would call an AI service
-      await new Promise(resolve => setTimeout(resolve, 1500)) // Simulate API call
+      console.log("🚀 Generating AI alternatives with Gemini...")
       
-      const foodName = selectedFoodForAlternatives.food.name.toLowerCase()
-      const quantity = selectedFoodForAlternatives.food.quantity
-      const unit = selectedFoodForAlternatives.food.unit
+      // Get existing alternatives for this food
+      const existingAlternatives = selectedFoodForAlternatives.food.alternatives || []
       
-      // Mock AI-generated alternatives based on food type
-      let suggestions = []
-      
-      if (foodName.includes('riso') || foodName.includes('pasta')) {
-        suggestions = [
-          { name: 'Quinoa', quantity, unit, calories: Math.round(Math.random() * 50 + 150) },
-          { name: 'Orzo perlato', quantity, unit, calories: Math.round(Math.random() * 50 + 140) }
-        ]
-      } else if (foodName.includes('pollo') || foodName.includes('carne')) {
-        suggestions = [
-          { name: 'Tofu marinato', quantity, unit, calories: Math.round(Math.random() * 50 + 120) },
-          { name: 'Tempeh', quantity, unit, calories: Math.round(Math.random() * 50 + 160) }
-        ]
-      } else if (foodName.includes('latte') || foodName.includes('yogurt')) {
-        suggestions = [
-          { name: 'Latte di avena', quantity, unit, calories: Math.round(Math.random() * 30 + 50) },
-          { name: 'Yogurt greco proteico', quantity, unit, calories: Math.round(Math.random() * 40 + 80) }
-        ]
-      } else if (foodName.includes('pane')) {
-        suggestions = [
-          { name: 'Pane integrale ai cereali', quantity, unit, calories: Math.round(Math.random() * 50 + 200) },
-          { name: 'Crackers di riso', quantity, unit, calories: Math.round(Math.random() * 40 + 180) }
-        ]
-      } else {
-        // Generic alternatives
-        suggestions = [
-          { name: `${foodName} biologico`, quantity, unit, calories: Math.round(Math.random() * 50 + 100) },
-          { name: `${foodName} integrale`, quantity, unit, calories: Math.round(Math.random() * 40 + 120) }
-        ]
+      // Prepare the request with patient context and existing alternatives
+      const request: GenerateAlternativesRequest = {
+        foodName: selectedFoodForAlternatives.food.name,
+        foodQuantity: selectedFoodForAlternatives.food.quantity,
+        foodUnit: selectedFoodForAlternatives.food.unit,
+        foodCalories: selectedFoodForAlternatives.food.calories || 0,
+        existingAlternatives: existingAlternatives.map((alt: any) => ({
+          name: alt.name,
+          quantity: alt.quantity,
+          unit: alt.unit,
+          calories: alt.calories || 0
+        })),
+        patientData: {
+          age: patientData.age?.toString() || "30",
+          sex: patientData.sex || "F",
+          height: patientData.height?.toString() || "170",
+          weight: patientData.weight?.toString() || "70",
+          targetCalories: patientData.targetCalories?.toString() || "2000",
+          mainGoal: patientData.mainGoal || "health",
+          restrictions: patientData.restrictions || [],
+          allergies: patientData.allergies || [],
+          notes: patientData.notes || ""
+        }
       }
       
-      setAiSuggestions(suggestions)
-      setShowAISuggestions(true)
+      console.log("📤 Sending request with existing alternatives:", request.existingAlternatives)
+      
+      // Call the server action
+      const response = await generateAlternatives(request)
+      
+      if (response.success && response.alternatives) {
+        console.log("✅ AI alternatives received:", response.alternatives)
+        setAiSuggestions(response.alternatives)
+        setShowAISuggestions(true)
+      } else {
+        console.error("❌ Failed to generate alternatives:", response.error)
+        // Fallback to simple alternatives
+        const fallbackSuggestions = [
+          { 
+            name: `${selectedFoodForAlternatives.food.name} biologico`, 
+            quantity: selectedFoodForAlternatives.food.quantity, 
+            unit: selectedFoodForAlternatives.food.unit, 
+            calories: selectedFoodForAlternatives.food.calories || 0 
+          },
+          { 
+            name: `${selectedFoodForAlternatives.food.name} integrale`, 
+            quantity: selectedFoodForAlternatives.food.quantity, 
+            unit: selectedFoodForAlternatives.food.unit, 
+            calories: Math.round((selectedFoodForAlternatives.food.calories || 0) * 1.05) 
+          }
+        ]
+        setAiSuggestions(fallbackSuggestions)
+        setShowAISuggestions(true)
+      }
       
     } catch (error) {
-      console.error('Error generating AI alternatives:', error)
+      console.error('❌ Error generating AI alternatives:', error)
+      
+      // Fallback alternatives
+      const fallbackSuggestions = [
+        { 
+          name: `${selectedFoodForAlternatives.food.name} biologico`, 
+          quantity: selectedFoodForAlternatives.food.quantity, 
+          unit: selectedFoodForAlternatives.food.unit, 
+          calories: selectedFoodForAlternatives.food.calories || 0 
+        },
+        { 
+          name: `${selectedFoodForAlternatives.food.name} integrale`, 
+          quantity: selectedFoodForAlternatives.food.quantity, 
+          unit: selectedFoodForAlternatives.food.unit, 
+          calories: Math.round((selectedFoodForAlternatives.food.calories || 0) * 1.05) 
+        }
+      ]
+      setAiSuggestions(fallbackSuggestions)
+      setShowAISuggestions(true)
     } finally {
       setIsGeneratingAI(false)
     }
@@ -671,7 +757,12 @@ export default function Step4PreviewFixed({
                                             variant="ghost"
                                             size="sm"
                                             className="h-6 w-6 p-0 text-secondary-500 hover:bg-secondary-100"
-                                            onClick={() => setSelectedFoodForAlternatives({ mealId: meal.id, foodId: food.id, food })}
+                                            onClick={() => {
+                                              setSelectedFoodForAlternatives({ mealId: meal.id, foodId: food.id, food })
+                                              setEditedFoodName(food.name)
+                                              setEditedFoodQuantity(food.quantity)
+                                              setEditedFoodUnit(food.unit)
+                                            }}
                                           >
                                             <Edit className="h-3 w-3" />
                                           </Button>
@@ -874,7 +965,7 @@ export default function Step4PreviewFixed({
               <CardHeader className="border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-xl font-bold text-gray-800">
-                    Alternative per: {selectedFoodForAlternatives.food.name}
+                    Modifica: {selectedFoodForAlternatives.food.name}
                   </CardTitle>
                   <Button
                     variant="ghost"
@@ -883,23 +974,94 @@ export default function Step4PreviewFixed({
                       setSelectedFoodForAlternatives(null)
                       setAiSuggestions([])
                       setShowAISuggestions(false)
+                      setEditingMainFood(false)
+                      setEditedFoodName("")
+                      setEditedFoodQuantity("")
+                      setEditedFoodUnit("g")
                     }}
                     className="h-8 w-8 p-0"
                   >
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
-                <p className="text-sm text-gray-600">
-                  Quantità originale: {selectedFoodForAlternatives.food.quantity}{selectedFoodForAlternatives.food.unit} 
-                  • {selectedFoodForAlternatives.food.calories || 0} kcal
-                </p>
               </CardHeader>
               
               <CardContent className="p-6 overflow-y-auto">
+                {/* Main Food Editing Section */}
+                <div className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-semibold text-blue-800">Alimento Principale</h4>
+                    <Button
+                      onClick={() => setEditingMainFood(!editingMainFood)}
+                      size="sm"
+                      variant="outline"
+                      className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                    >
+                      {editingMainFood ? (
+                        <>
+                          <X className="h-4 w-4 mr-2" />
+                          Annulla
+                        </>
+                      ) : (
+                        <>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Modifica
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  {editingMainFood ? (
+                    <div className="space-y-3">
+                      <Input
+                        placeholder="Nome alimento"
+                        value={editedFoodName}
+                        onChange={(e) => setEditedFoodName(e.target.value)}
+                        className="w-full"
+                      />
+                      <div className="grid grid-cols-2 gap-3">
+                        <Input
+                          placeholder="Quantità"
+                          value={editedFoodQuantity}
+                          onChange={(e) => setEditedFoodQuantity(e.target.value)}
+                        />
+                        <Select value={editedFoodUnit} onValueChange={setEditedFoodUnit}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="g">g</SelectItem>
+                            <SelectItem value="ml">ml</SelectItem>
+                            <SelectItem value="pezzi">pezzi</SelectItem>
+                            <SelectItem value="porzione">porzione</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button
+                        onClick={updateMainFood}
+                        disabled={!editedFoodName || !editedFoodQuantity}
+                        className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                      >
+                        <Check className="h-4 w-4 mr-2" />
+                        Salva Modifiche
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-white rounded-lg border border-blue-200">
+                      <p className="font-medium text-gray-800">
+                        {selectedFoodForAlternatives.food.name}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {selectedFoodForAlternatives.food.quantity}{selectedFoodForAlternatives.food.unit}
+                        {selectedFoodForAlternatives.food.calories > 0 && ` • ${selectedFoodForAlternatives.food.calories} kcal`}
+                      </p>
+                    </div>
+                  )}
+                </div>
                 {/* Current Alternatives */}
-                {selectedFoodForAlternatives.food.alternatives && selectedFoodForAlternatives.food.alternatives.length > 0 && (
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-gray-800 mb-3">Alternative attuali:</h4>
+                <div className="mb-6">
+                  <h4 className="font-semibold text-gray-800 mb-3">Alternative Disponibili</h4>
+                  {selectedFoodForAlternatives.food.alternatives && selectedFoodForAlternatives.food.alternatives.length > 0 ? (
                     <div className="space-y-2">
                       {selectedFoodForAlternatives.food.alternatives.map((alt: any, index: number) => (
                         <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -920,8 +1082,12 @@ export default function Step4PreviewFixed({
                         </div>
                       ))}
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">
+                      Nessuna alternativa disponibile
+                    </p>
+                  )}
+                </div>
 
                 {/* Add New Alternative */}
                 <div>
@@ -954,17 +1120,17 @@ export default function Step4PreviewFixed({
                   
                   {/* AI Suggestions */}
                   {showAISuggestions && aiSuggestions.length > 0 && (
-                    <div className="mb-6 p-4 bg-accent-50 dark:bg-accent-900/20 border border-accent-200 dark:border-accent-700 rounded-lg">
-                      <h5 className="font-medium text-accent-800 dark:text-accent-300 mb-3 flex items-center">
+                    <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                      <h5 className="font-medium text-purple-800 mb-3 flex items-center">
                         <Wand2 className="h-4 w-4 mr-2" />
                         Alternative suggerite dall'AI:
                       </h5>
                       <div className="space-y-2 mb-4">
                         {aiSuggestions.map((suggestion, index) => (
-                          <div key={index} className="flex items-center justify-between p-3 bg-card border border-accent-200 dark:border-accent-700 rounded-lg">
+                          <div key={index} className="flex items-center justify-between p-3 bg-white border border-purple-200 rounded-lg">
                             <div>
-                              <span className="font-medium text-accent-800 dark:text-accent-300">{suggestion.name}</span>
-                              <span className="text-accent-600 dark:text-accent-400 ml-2">
+                              <span className="font-medium text-purple-800">{suggestion.name}</span>
+                              <span className="text-purple-600 ml-2">
                                 {suggestion.quantity}{suggestion.unit} • {suggestion.calories} kcal
                               </span>
                             </div>
@@ -975,7 +1141,7 @@ export default function Step4PreviewFixed({
                         <Button
                           onClick={acceptAISuggestions}
                           size="sm"
-                          className="flex-1 bg-accent-600 hover:bg-accent-700 text-white"
+                          className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
                         >
                           <Check className="h-4 w-4 mr-2" />
                           Aggiungi Alternative
@@ -984,7 +1150,7 @@ export default function Step4PreviewFixed({
                           onClick={rejectAISuggestions}
                           size="sm"
                           variant="outline"
-                          className="flex-1 border-accent-200 text-accent-600 hover:bg-accent-50 dark:border-accent-700 dark:text-accent-400 dark:hover:bg-accent-900/20"
+                          className="flex-1 border-purple-200 text-purple-600 hover:bg-purple-50"
                         >
                           <X className="h-4 w-4 mr-2" />
                           Rifiuta
@@ -992,7 +1158,7 @@ export default function Step4PreviewFixed({
                       </div>
                     </div>
                   )}
-
+                  
                   {/* Manual Alternative Input */}
                   <div className={`space-y-4 ${showAISuggestions ? 'opacity-50' : ''}`}>
                     <Input
@@ -1016,8 +1182,8 @@ export default function Step4PreviewFixed({
                         <SelectContent>
                           <SelectItem value="g">g</SelectItem>
                           <SelectItem value="ml">ml</SelectItem>
-                          <SelectItem value="pz">pz</SelectItem>
-                          <SelectItem value="cucchiai">cucchiai</SelectItem>
+                          <SelectItem value="pezzi">pezzi</SelectItem>
+                          <SelectItem value="porzione">porzione</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1035,6 +1201,10 @@ export default function Step4PreviewFixed({
                           setSelectedFoodForAlternatives(null)
                           setAiSuggestions([])
                           setShowAISuggestions(false)
+                          setEditingMainFood(false)
+                          setEditedFoodName("")
+                          setEditedFoodQuantity("")
+                          setEditedFoodUnit("g")
                         }}
                         className="flex-1"
                       >
@@ -1080,7 +1250,7 @@ export default function Step4PreviewFixed({
           >
             {isLoading ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-ai-spin" />
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 Creando Paziente...
               </>
             ) : (
