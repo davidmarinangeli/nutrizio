@@ -21,6 +21,41 @@ const config: Config = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["var(--font-lexend)", ...fontFamily.sans],
+        lexend: ["var(--font-lexend)", ...fontFamily.sans],
+      },
+      fontSize: {
+        // Material Expressive UI Typography Scale with Lexend
+        'display-large': ['57px', { lineHeight: '64px', fontWeight: '400', letterSpacing: '-0.25px' }],
+        'display-medium': ['45px', { lineHeight: '52px', fontWeight: '400', letterSpacing: '0px' }],
+        'display-small': ['36px', { lineHeight: '44px', fontWeight: '400', letterSpacing: '0px' }],
+        
+        'headline-large': ['32px', { lineHeight: '40px', fontWeight: '500', letterSpacing: '0px' }],
+        'headline-medium': ['28px', { lineHeight: '36px', fontWeight: '500', letterSpacing: '0px' }],
+        'headline-small': ['24px', { lineHeight: '32px', fontWeight: '500', letterSpacing: '0px' }],
+        
+        'title-large': ['22px', { lineHeight: '28px', fontWeight: '600', letterSpacing: '0px' }],
+        'title-medium': ['16px', { lineHeight: '24px', fontWeight: '600', letterSpacing: '0.15px' }],
+        'title-small': ['14px', { lineHeight: '20px', fontWeight: '600', letterSpacing: '0.1px' }],
+        
+        'label-large': ['14px', { lineHeight: '20px', fontWeight: '500', letterSpacing: '0.1px' }],
+        'label-medium': ['12px', { lineHeight: '16px', fontWeight: '500', letterSpacing: '0.5px' }],
+        'label-small': ['11px', { lineHeight: '16px', fontWeight: '500', letterSpacing: '0.5px' }],
+        
+        'body-large': ['16px', { lineHeight: '24px', fontWeight: '400', letterSpacing: '0.5px' }],
+        'body-medium': ['14px', { lineHeight: '20px', fontWeight: '400', letterSpacing: '0.25px' }],
+        'body-small': ['12px', { lineHeight: '16px', fontWeight: '400', letterSpacing: '0.4px' }],
+      },
+      fontWeight: {
+        // Lexend weight hierarchy for Material Expressive UI
+        'light': '300',      // For large display text
+        'normal': '400',     // Body text, display text
+        'medium': '500',     // Headlines, labels, emphasis
+        'semibold': '600',   // Titles, important actions
+        'bold': '700',       // Strong emphasis
+        'extrabold': '800',  // Hero elements, major CTAs
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",

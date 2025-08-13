@@ -2,14 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@layer base {
+  * {
+    @apply border-border;
   }
+  
+  html {
+    font-family: var(--font-lexend), system-ui, -apple-system, sans-serif;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-lexend), system-ui, -apple-system, sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+  }
+  
+  /* Material Expressive Typography Base Styles */
+  h1 { @apply text-display-large font-normal tracking-tight; }
+  h2 { @apply text-headline-large font-medium; }
+  h3 { @apply text-headline-medium font-medium; }
+  h4 { @apply text-headline-small font-medium; }
+  h5 { @apply text-title-large font-semibold; }
+  h6 { @apply text-title-medium font-semibold; }
+  
+  p { @apply text-body-medium; }
+  small { @apply text-body-small; }
+  
+  /* Interactive elements */
+  button { @apply text-label-large font-medium; }
+  input, textarea, select { @apply text-body-medium; }
+  label { @apply text-label-medium font-medium; }
 }
 
 @layer base {
@@ -159,5 +187,126 @@ body {
     box-shadow: 0 0 25px hsl(var(--primary) / 0.5);
     transform: translateY(-1px);
     transition: all 0.3s ease-in-out;
+  }
+  
+  /* Material Expressive Typography Utilities with Lexend */
+  .typography-display-large {
+    font-size: 57px;
+    line-height: 64px;
+    font-weight: 400;
+    letter-spacing: -0.25px;
+    font-family: var(--font-lexend);
+  }
+  
+  .typography-display-medium {
+    font-size: 45px;
+    line-height: 52px;
+    font-weight: 400;
+    letter-spacing: 0px;
+    font-family: var(--font-lexend);
+  }
+  
+  .typography-display-small {
+    font-size: 36px;
+    line-height: 44px;
+    font-weight: 400;
+    letter-spacing: 0px;
+    font-family: var(--font-lexend);
+  }
+  
+  .typography-headline-large {
+    font-size: 32px;
+    line-height: 40px;
+    font-weight: 500;
+    letter-spacing: 0px;
+    font-family: var(--font-lexend);
+  }
+  
+  .typography-headline-medium {
+    font-size: 28px;
+    line-height: 36px;
+    font-weight: 500;
+    letter-spacing: 0px;
+    font-family: var(--font-lexend);
+  }
+  
+  .typography-headline-small {
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 500;
+    letter-spacing: 0px;
+    font-family: var(--font-lexend);
+  }
+  
+  .typography-title-large {
+    font-size: 22px;
+    line-height: 28px;
+    font-weight: 600;
+    letter-spacing: 0px;
+    font-family: var(--font-lexend);
+  }
+  
+  .typography-title-medium {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+    letter-spacing: 0.15px;
+    font-family: var(--font-lexend);
+  }
+  
+  .typography-title-small {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    font-family: var(--font-lexend);
+  }
+  
+  .typography-label-large {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    font-family: var(--font-lexend);
+  }
+  
+  .typography-label-medium {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    font-family: var(--font-lexend);
+  }
+  
+  .typography-label-small {
+    font-size: 11px;
+    line-height: 16px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    font-family: var(--font-lexend);
+  }
+  
+  .typography-body-large {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    font-family: var(--font-lexend);
+  }
+  
+  .typography-body-medium {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+    letter-spacing: 0.25px;
+    font-family: var(--font-lexend);
+  }
+  
+  .typography-body-small {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+    letter-spacing: 0.4px;
+    font-family: var(--font-lexend);
   }
 }
